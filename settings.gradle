@@ -2,6 +2,7 @@ include( "gateway")
 include( "auth-server")
 include( "bot-api")
 include( "client-api")
+include( "bots-model-idl")
 
 rootProject.name = "bot-constructor"
 
