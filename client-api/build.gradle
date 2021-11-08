@@ -1,13 +1,72 @@
+import io.netifi.flatbuffers.plugin.tasks.FlatBuffers
+
+plugins {
+    id "org.springframework.boot"
+    id "io.spring.dependency-management"
+    id "io.netifi.flatbuffers"
+    id "org.jetbrains.kotlin.jvm"
+    id "org.jetbrains.kotlin.plugin.spring"
+}
+
+sourceCompatibility = JavaVersion.VERSION_11
+
+configurations {
+    flatbuf
+}
+
 dependencies {
+    flatbuf(project(":client-model-idl"))
+
     implementation("org.springframework.boot:spring-boot-starter-actuator")
-    implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
     implementation("org.springframework.boot:spring-boot-starter-rsocket")
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
+    implementation("org.springframework.boot:spring-boot-starter-security")
+    implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
+
+    implementation("de.flapdoodle.embed:de.flapdoodle.embed.mongo")
+
+    implementation("io.jsonwebtoken:jjwt-api:0.11.2")
+    runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.2")
+    runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.2")
+
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+
+    testImplementation("io.mockk:mockk:1.12.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
+    testImplementation("org.springframework.security:spring-security-test")
 }
+
+test {
+    useJUnitPlatform()
+}
+
+flatbuffers {
+    flatBuffersVersion = '2.0.0'
+}
+
+processResources {
+    dependsOn configurations.flatbuf
+    configurations.flatbuf.files.each {
+        from(zipTree(it).matching {
+            include "*.fbs"
+        })
+    }
+}
+
+task createFlatBuffers(type: FlatBuffers, dependsOn: ['processResources']) {
+    language = 'kotlin'
+    inputDir = file("$buildDir/resources/main")
+    outputDir = file("$buildDir/generated/sources/flatbuffers/java/main")
+    extraArgs = "--gen-mutable"
+}
+
+compileKotlin {
+    dependsOn createFlatBuffers
+}
+

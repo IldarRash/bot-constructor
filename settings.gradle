@@ -1,8 +1,10 @@
-include( "gateway")
-include( "auth-server")
-include( "bot-api")
-include( "client-api")
-include( "bots-model-idl")
+include("gateway")
+include("auth-server")
+include("bot-api")
+include("client-api")
+include("bots-model-idl")
+include("client-model-idl")
+include("client-uisrc")
 
 rootProject.name = "bot-constructor"
 

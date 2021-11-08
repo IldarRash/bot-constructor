@@ -1,0 +1,23 @@
+namespace com.example.botconstructor;
+
+enum BotType:byte { Instagram = 0, Vkontakte = 1, Telegram = 2 }
+
+table Question {
+    question: string;
+    key_words: [string];
+}
+
+table BotQuestions {
+    id: int64;
+    questions: [Question]
+}
+
+table BotTemplate {
+    id: int64;
+    name: string;
+    owner_id: int64;
+    questions: BotQuestions;
+    type: BotType;
+}
+
+root_type BotTemplate;
