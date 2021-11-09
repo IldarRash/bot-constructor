@@ -9,7 +9,7 @@ table Question {
 
 table BotQuestions {
     id: int64;
-    questions: [Question]
+    questions: [Question];
 }
 
 table BotTemplate {
