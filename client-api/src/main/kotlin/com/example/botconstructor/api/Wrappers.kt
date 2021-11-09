@@ -1,4 +1,4 @@
-package com.realworld.springmongo.api
+package com.example.botconstructor.api
 
 import com.example.botconstructor.dto.ProfileView
 import com.fasterxml.jackson.annotation.JsonProperty

@@ -1,0 +1,45 @@
+import io.netifi.flatbuffers.plugin.tasks.FlatBuffers
+
+plugins {
+    id "java"
+    id "io.netifi.flatbuffers"
+    id "com.github.node-gradle.node"
+}
+
+sourceCompatibility = JavaVersion.VERSION_11
+
+configurations {
+    flatbuf
+}
+
+dependencies {
+    flatbuf(project(":client-model-idl"))
+}
+
+flatbuffers {
+    flatBuffersVersion = '1.12.0'
+}
+
+processResources {
+    dependsOn configurations.flatbuf
+    dependsOn yarn_install
+
+    configurations.flatbuf.files.each {
+        from(zipTree(it).matching {
+            include "*.fbs"
+        })
+    }
+}
+
+task createFlatBuffers(type: FlatBuffers, dependsOn: ['processResources']) {
+    language = 'ts'
+    inputDir = file("$buildDir/resources/main")
+    outputDir = file("$buildDir/generated/sources/flatbuffers/js/main")
+    extraArgs = "--gen-mutable --es6-js-export"
+}
+
+yarn_run_webpack.dependsOn(createFlatBuffers)
+
+classes {
+    dependsOn yarn_run_webpack
+}

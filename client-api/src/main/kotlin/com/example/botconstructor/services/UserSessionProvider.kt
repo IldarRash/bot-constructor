@@ -1,4 +1,4 @@
-package com.realworld.springmongo.user
+package com.example.botconstructor.services
 
 import com.example.botconstructor.TokenPrincipal
 import com.example.botconstructor.exceptions.InvalidRequestException

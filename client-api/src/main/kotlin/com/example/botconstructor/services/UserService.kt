@@ -7,7 +7,6 @@ import com.example.botconstructor.repos.UserRepository
 import com.example.botconstructor.repos.findByEmailOrFail
 import com.example.botconstructor.repos.findByUsernameOrFail
 import com.example.botconstructor.security.UserTokenProvider
-import com.realworld.springmongo.user.UserSession
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.stereotype.Component
 import java.util.*

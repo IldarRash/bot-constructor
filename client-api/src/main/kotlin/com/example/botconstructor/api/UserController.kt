@@ -1,8 +1,8 @@
-package com.realworld.springmongo.api
+package com.example.botconstructor.api
 
 import com.example.botconstructor.dto.*
 import com.example.botconstructor.services.UserService
-import com.realworld.springmongo.user.UserSessionProvider
+import com.example.botconstructor.services.UserSessionProvider
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import javax.validation.Valid
