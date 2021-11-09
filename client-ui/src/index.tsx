@@ -1,18 +1,11 @@
-import React from "react";
-import ReactDOM from "react-dom";
-import agent from "./agent";
-
-const App = () => (
-    <h1>
-        My React and TypeScript App!!{" "}
-        {agent.Auth.register("test", "test@mail.ru", "test")}
-        {new Date().toLocaleDateString()}
-    </h1>
-);
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { BrowserRouter } from "react-router-dom";
+import Login from "./component/Login";
 
 ReactDOM.render(
-    <React.StrictMode>
-        <App />
-    </React.StrictMode>,
-    document.getElementById("root")
+    <BrowserRouter>
+        <Login history={""} />
+    </BrowserRouter>,
+    document.getElementById('root')
 );

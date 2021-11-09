@@ -47,13 +47,15 @@ const config: Configuration = {
     devtool: "inline-source-map",
     devServer: {
         static: path.join(__dirname, "build"),
-        historyApiFallback: true,
         port: 3000,
-        open: true,
         hot: true,
         proxy:
             {
-                '/api': 'http://localhost:9000',
+                '/api': {
+                    target: 'http://localhost:9000',
+                    secure: false,
+                }
+
             }
     },
 };

@@ -1,58 +1,15 @@
-const encode = encodeURIComponent;
-const responseBody = res => res.body;
+import axios from "axios";
 
-let token = null;
 
 const requests = {
-  /*del:  url => {
-    if (token)
-      fetch(`${url}`, {
-          method: "DELETE",
-          headers: {
-        "Authorization": `Token ${token}`,
-          "accepts":"application/json"
-        },}).then(responseBody)
-    else
-      fetch(`${url}`, {
-        method: "DELETE"}).then(responseBody)
-  },
-  get: url => {
-    if (token)
-      fetch(`${url}`, {headers: {"Authorization": `Token ${token}`,
-          "accepts":"application/json"}}).then(responseBody)
-    else
-      fetch(`${url}`,{method: }).then(responseBody)
-  },
-  put: (url, body) =>{
-    if (token)
-      axios.put(`${url}`, { body }, { headers: {"Authorization" : `Token ${token}`}}).then(responseBody)
-    else
-      axios.put(`${url}`, { body }, ).then(responseBody)
-  },*/
   post: (url, body) => {
-    console.log("info =", url, body, token)
-    if (token)
-      fetch(`http://localhost:9000/api${url}` , {
-        body: JSON.stringify(body),
-        method: "POST",
-        mode: 'no-cors',
-        headers: {"Authorization" : `Token ${token}`, "accepts":"application/json", }
-      }).then(responseBody)
-    else
-      fetch(`http://localhost:9000/api${url}` , {
-        body: JSON.stringify(body),
-        method: "POST",
-        mode: 'no-cors',
-        headers: {"accepts":"application/json"}}
-      ).then(responseBody)
+    console.log("info =", url, body)
+    console.log("Axios = ", axios.defaults.headers, axios.defaults.auth)
+    return axios.post(`http://localhost:3000/api${url}`, JSON.stringify(body) , {headers: {"Content-Type":"application/json"}}).then(answer => answer.data)
   },
 };
 
 const Auth = {
-  /*current: () =>
-    requests.get('/user'),*/
-  login: (email, password) =>
-    requests.post('/users/login', { user: { email, password } }),
   register: (username, email, password) =>
     requests.post('/users', { user: { username, email, password } }),
  /* save: user =>
@@ -65,9 +22,9 @@ const Tags = {
 };
 */
 
-const limit = (count, p) => `limit=${count}&offset=${p ? p * count : 0}`;
+/*const limit = (count, p) => `limit=${count}&offset=${p ? p * count : 0}`;
 const omitSlug = article => Object.assign({}, article, { slug: undefined })
-/*const Articles = {
+const Articles = {
   all: page =>
     requests.get(`/articles?${limit(10, page)}`),
   byAuthor: (author, page) =>
@@ -112,5 +69,5 @@ const Profile = {
 
 export default {
   Auth,
-  setToken: _token => { token = _token; }
+/*  setToken: _token => { token = _token; }*/
 };
