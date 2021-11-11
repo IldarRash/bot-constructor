@@ -2,12 +2,9 @@ package com.example.botconstructor.services
 
 import com.example.botconstructor.dto.*
 import com.example.botconstructor.exceptions.InvalidRequestException
-import com.example.botconstructor.model.User
 import com.example.botconstructor.repos.UserRepository
 import com.example.botconstructor.repos.findByEmailOrFail
-import com.example.botconstructor.repos.findByUsernameOrFail
 import com.example.botconstructor.security.UserTokenProvider
-import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import reactor.util.function.Tuple2
@@ -48,7 +45,7 @@ class UserService(
                 .map {
                     val token = userTokenProvider.getToken(it.id)
                     it.toUserView(token)
-                };
+                }
     }
 
     fun updateUser(request: UpdateUserRequest, userSession: UserSession): Mono<UserView> {
@@ -63,7 +60,7 @@ class UserService(
             return Mono.error { InvalidRequestException("Email", "already in use") }
         if (tuple.t2)
             return Mono.error { InvalidRequestException("Username", "already in use") }
-        return Mono.just(tuple);
+        return Mono.just(tuple)
     }
 
 }

@@ -1,4 +1,4 @@
-package com.example.botconstructor;
+package com.example.botconstructor
 
 import com.example.botconstructor.security.UserTokenProvider
 import io.jsonwebtoken.Claims
@@ -14,17 +14,17 @@ class JwtSigner : UserTokenProvider {
 
     private val keyPair = Keys.keyPairFor(SignatureAlgorithm.RS256)
     private val jwtParser = Jwts.parserBuilder()
-        .setSigningKey(keyPair.public)
-        .build()
+            .setSigningKey(keyPair.public)
+            .build()
 
     fun validate(jwt: String): Jws<Claims> = jwtParser.parseClaimsJws(jwt)
 
     fun generateToken(userId: String): String = Jwts.builder()
-        .signWith(keyPair.private, SignatureAlgorithm.RS256)
-        .setSubject(userId)
-        .setExpiration(expirationDate())
-        .setIssuer("identity")
-        .compact()
+            .signWith(keyPair.private, SignatureAlgorithm.RS256)
+            .setSubject(userId)
+            .setExpiration(expirationDate())
+            .setIssuer("identity")
+            .compact()
 
     private fun expirationDate(): Date {
         val expirationDate = System.currentTimeMillis() + sessionTime()

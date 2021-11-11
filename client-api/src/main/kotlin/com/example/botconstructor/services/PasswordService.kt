@@ -10,5 +10,5 @@ class PasswordService {
     fun encodePassword(rowPassword: String): String = encoder.encode(rowPassword)
 
     fun matches(rowPassword: String, encodedPassword: String): Boolean =
-        encoder.matches(rowPassword, encodedPassword)
+            encoder.matches(rowPassword, encodedPassword)
 }

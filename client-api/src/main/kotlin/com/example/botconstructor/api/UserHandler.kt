@@ -1,17 +1,15 @@
 package com.example.botconstructor.api
 
 import com.example.botconstructor.dto.*
+import com.example.botconstructor.exceptions.InvalidRequestException
 import com.example.botconstructor.services.UserService
 import com.example.botconstructor.services.UserSessionProvider
-import com.fasterxml.jackson.databind.ObjectMapper
-import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
-import org.springframework.web.bind.annotation.*
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
-import org.springframework.web.reactive.function.server.ServerResponse.*
+import org.springframework.web.reactive.function.server.ServerResponse.badRequest
+import org.springframework.web.reactive.function.server.ServerResponse.ok
 import reactor.core.publisher.Mono
-import javax.validation.Valid
 
 @Service
 class UserHandler(
@@ -27,7 +25,7 @@ class UserHandler(
                 }.flatMap {
                     ok().body(it, UserView::class.java)
                 }.onErrorResume {
-                    badRequest().bodyValue(it.localizedMessage)
+                    badRequest().bodyValue(invalidRequestExceptionHandler(it as InvalidRequestException))
                 }
     }
 
@@ -47,11 +45,10 @@ class UserHandler(
                             UserView::class.java)
                 }
                 .onErrorResume {
-                    badRequest().bodyValue(it.localizedMessage)
+                    badRequest().bodyValue(invalidRequestExceptionHandler(it as InvalidRequestException))
                 }
     }
 
-    @PutMapping("/user")
     fun updateUser(serverRequest: ServerRequest): Mono<ServerResponse> {
         return userSessionProvider.getCurrentUserSessionOrFail()
                 .zipWith(serverRequest
@@ -63,7 +60,18 @@ class UserHandler(
                             UserView::class.java)
                 }
                 .onErrorResume {
-                    badRequest().bodyValue(it.localizedMessage)
+                    badRequest().bodyValue(invalidRequestExceptionHandler(it as InvalidRequestException))
                 }
     }
+
+
+    fun invalidRequestExceptionHandler(e: InvalidRequestException): InvalidRequestExceptionResponse {
+        val subject = e.subject
+        val violation = e.violation
+        val errors = mapOf(subject to listOf(violation))
+        return InvalidRequestExceptionResponse(errors)
+    }
+
+    data class InvalidRequestExceptionResponse(val errors: Map<String, List<String>>)
+
 }

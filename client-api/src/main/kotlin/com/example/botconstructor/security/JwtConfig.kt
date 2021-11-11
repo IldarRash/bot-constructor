@@ -1,4 +1,4 @@
-package com.example.botconstructor;
+package com.example.botconstructor
 
 import com.example.botconstructor.exceptions.InvalidRequestException
 import org.springframework.context.annotation.Bean
@@ -18,13 +18,13 @@ class JwtConfig {
 
     @Bean
     fun jwtServerAuthenticationConverter(tokenFormatter: TokenFormatter): ServerAuthenticationConverter =
-        ServerAuthenticationConverter { exchange ->
-            val authorizationHeader = getAuthorizationHeader(exchange)
-            authorizationHeader?.let {
-                val token = tokenFormatter.getRowToken(it)
-                UsernamePasswordAuthenticationToken(token, token)
-            }.toMono()
-        }
+            ServerAuthenticationConverter { exchange ->
+                val authorizationHeader = getAuthorizationHeader(exchange)
+                authorizationHeader?.let {
+                    val token = tokenFormatter.getRowToken(it)
+                    UsernamePasswordAuthenticationToken(token, token)
+                }.toMono()
+            }
 
     private fun getAuthorizationHeader(exchange: ServerWebExchange): String? {
         val headers = exchange.request.headers[HttpHeaders.AUTHORIZATION] ?: emptyList()
@@ -33,19 +33,19 @@ class JwtConfig {
 
     @Bean
     fun jwtAuthManager(signer: JwtSigner): ReactiveAuthenticationManager =
-        ReactiveAuthenticationManager { authentication ->
-            val token = authentication.credentials as String
-            val jws = signer.validate(token)
-            val authority = SimpleGrantedAuthority("ROLE_USER")
-            val userId = jws.body.subject
-            val tokenPrincipal = TokenPrincipal(userId, token)
-            UsernamePasswordAuthenticationToken(tokenPrincipal, token, listOf(authority)).toMono()
-        }
+            ReactiveAuthenticationManager { authentication ->
+                val token = authentication.credentials as String
+                val jws = signer.validate(token)
+                val authority = SimpleGrantedAuthority("ROLE_USER")
+                val userId = jws.body.subject
+                val tokenPrincipal = TokenPrincipal(userId, token)
+                UsernamePasswordAuthenticationToken(tokenPrincipal, token, listOf(authority)).toMono()
+            }
 
     @Bean
     fun authenticationFilter(
-        manager: ReactiveAuthenticationManager,
-        converter: ServerAuthenticationConverter
+            manager: ReactiveAuthenticationManager,
+            converter: ServerAuthenticationConverter
     ): AuthenticationWebFilter = AuthenticationWebFilter(manager).apply {
         setServerAuthenticationConverter(converter)
     }

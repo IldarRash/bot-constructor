@@ -6,10 +6,10 @@ logging:
 
 spring:
   data:
-     mongodb:
-       database: bot
-       username: root
-       password: example
+    mongodb:
+      database: bot
+      username: root
+      password: example
   rsocket:
     server:
       mapping-path: /rsocket

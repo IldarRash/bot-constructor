@@ -1,4 +1,4 @@
-package com.example.botconstructor;
+package com.example.botconstructor
 
 import org.springframework.data.domain.Sort
 import org.springframework.data.mongodb.core.mapping.Field

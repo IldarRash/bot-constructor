@@ -1,4 +1,4 @@
-package com.example.botconstructor;
+package com.example.botconstructor.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -16,28 +16,28 @@ class SecurityConfig {
 
     @Bean
     fun securityWebFilterChain(
-        http: ServerHttpSecurity,
-        webFilter: AuthenticationWebFilter?,
-        endpointsConfig: EndpointsSecurityConfig
+            http: ServerHttpSecurity,
+            webFilter: AuthenticationWebFilter?,
+            endpointsConfig: EndpointsSecurityConfig
     ): SecurityWebFilterChain = http
-        .authorizeExchange()
-        .applyConfig(endpointsConfig)
-        .and()
-        .addFilterAt(webFilter, SecurityWebFiltersOrder.AUTHENTICATION)
-        .httpBasic().disable()
-        .cors().disable()
-        .csrf().disable()
-        .formLogin().disable()
-        .logout().disable()
-        .build()
+            .authorizeExchange()
+            .applyConfig(endpointsConfig)
+            .and()
+            .addFilterAt(webFilter, SecurityWebFiltersOrder.AUTHENTICATION)
+            .httpBasic().disable()
+            .cors().disable()
+            .csrf().disable()
+            .formLogin().disable()
+            .logout().disable()
+            .build()
 
 
     @Bean
     fun endpointsConfig() = EndpointsSecurityConfig { http ->
         http
-            .pathMatchers(HttpMethod.POST, "/api/users", "/api/users/login").permitAll()
-            .pathMatchers(HttpMethod.GET, "/actuator/**", "/actuator").permitAll()
-            .anyExchange().authenticated()
+                .pathMatchers(HttpMethod.POST, "/api/users", "/api/users/login").permitAll()
+                .pathMatchers(HttpMethod.GET, "/actuator/**", "/actuator").permitAll()
+                .anyExchange().authenticated()
     }
 
     private fun AuthorizeExchangeSpec.applyConfig(config: EndpointsSecurityConfig) = config.apply(this)

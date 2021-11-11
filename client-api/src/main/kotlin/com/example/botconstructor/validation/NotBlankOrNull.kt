@@ -11,9 +11,9 @@ import kotlin.reflect.KClass
 @Retention(AnnotationRetention.RUNTIME)
 @Constraint(validatedBy = [NotBlankOrNullValidator::class])
 annotation class NotBlankOrNull(
-    val message: String = "{javax.validation.constraints.NotBlank.message}",
-    val groups: Array<KClass<*>> = [],
-    val payload: Array<KClass<out Payload>> = [],
+        val message: String = "{javax.validation.constraints.NotBlank.message}",
+        val groups: Array<KClass<*>> = [],
+        val payload: Array<KClass<out Payload>> = [],
 )
 
 private class NotBlankOrNullValidator : ConstraintValidator<NotBlankOrNull, String?> {

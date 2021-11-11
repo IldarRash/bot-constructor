@@ -4,9 +4,9 @@ import org.springframework.data.domain.Pageable
 import org.springframework.data.domain.Sort
 
 class OffsetBasedPageable(
-    private val limit: Int,
-    private val offset: Long,
-    private val sort: Sort = Sort.unsorted(),
+        private val limit: Int,
+        private val offset: Long,
+        private val sort: Sort = Sort.unsorted(),
 ) : Pageable {
 
     init {
