@@ -9,6 +9,8 @@ import com.example.botconstructor.repos.findByUsernameOrFail
 import com.example.botconstructor.security.UserTokenProvider
 import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.stereotype.Component
+import reactor.core.publisher.Mono
+import reactor.util.function.Tuple2
 import java.util.*
 
 @Component
@@ -18,24 +20,24 @@ class UserService(
         private val userTokenProvider: UserTokenProvider,
 ) {
 
-    suspend fun signup(request: UserRegistrationRequest): UserView {
-        if (userRepository.existsByEmail(request.email).awaitSingle()) {
-            throw emailAlreadyInUseException()
-        }
-        if (userRepository.existsByUsername(request.username).awaitSingle()) {
-            throw usernameAlreadyInUseException()
-        }
+    fun signup(request: UserRegistrationRequest): Mono<UserView> {
         val encodedPassword = passwordService.encodePassword(request.password)
         val id = UUID.randomUUID().toString()
         val user = request.toUser(encodedPassword, id)
-        return userRepository.save(user)
-                .map {
-                    val token = userTokenProvider.getToken(it.id)
-                    it.toUserView(token)
-                }.awaitSingle()
+        return userRepository.existsByEmail(request.email)
+                .zipWith(userRepository.existsByUsername(request.username))
+                .flatMap { alreadyInUserException(it) }
+                .flatMap {
+                    userRepository.save(user)
+                            .map {
+                                val token = userTokenProvider.getToken(it.id)
+                                it.toUserView(token)
+                            }
+                }
+
     }
 
-    suspend fun login(request: UserAuthenticationRequest): UserView {
+    fun login(request: UserAuthenticationRequest): Mono<UserView> {
         return userRepository.findByEmailOrFail(request.email)
                 .map {
                     if (!passwordService.matches(rowPassword = request.password, encodedPassword = it.encodedPassword)) {
@@ -46,50 +48,22 @@ class UserService(
                 .map {
                     val token = userTokenProvider.getToken(it.id)
                     it.toUserView(token)
-                }.awaitSingle()
+                };
     }
 
-    suspend fun updateUser(request: UpdateUserRequest, userSession: UserSession): UserView {
+    fun updateUser(request: UpdateUserRequest, userSession: UserSession): Mono<UserView> {
         val (user, token) = userSession
-        updateUser(request, user)
-        val savedUser = userRepository.save(user).awaitSingle()
-        return savedUser.toUserView(token)
+        return userRepository.save(user)
+                .map { it.toUserView(token) }
+
     }
 
-    private suspend fun updateUser(request: UpdateUserRequest, user: User) {
-        request.bio?.let { user.bio = it }
-        request.image?.let { user.image = it }
-        request.password?.let { user.encodedPassword = passwordService.encodePassword(it) }
-        request.username?.let { updateUsername(user, it) }
-        request.email?.let { updateEmail(user, it) }
+    fun alreadyInUserException(tuple: Tuple2<Boolean?, Boolean?>): Mono<Tuple2<Boolean?, Boolean?>> {
+        if (tuple.t1)
+            return Mono.error { InvalidRequestException("Email", "already in use") }
+        if (tuple.t2)
+            return Mono.error { InvalidRequestException("Username", "already in use") }
+        return Mono.just(tuple);
     }
 
-    suspend fun getProfile(username: String, viewer: User?): ProfileView = userRepository
-            .findByUsernameOrFail(username)
-            .awaitSingle()
-            .toProfileView(viewer)
-
-    private suspend fun updateUsername(user: User, newUsername: String) {
-        if (user.username == newUsername) {
-            return
-        }
-        if (userRepository.existsByUsername(newUsername).awaitSingle()) {
-            throw usernameAlreadyInUseException()
-        }
-        user.username = newUsername
-    }
-
-    private suspend fun updateEmail(user: User, newEmail: String) {
-        if (user.email == newEmail) {
-            return
-        }
-        if (userRepository.existsByEmail(newEmail).awaitSingle()) {
-            throw emailAlreadyInUseException()
-        }
-        user.email = newEmail
-    }
-
-    private fun usernameAlreadyInUseException() = InvalidRequestException("Username", "already in use")
-
-    private fun emailAlreadyInUseException() = InvalidRequestException("Email", "already in use")
 }

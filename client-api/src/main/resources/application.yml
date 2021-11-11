@@ -7,7 +7,7 @@ logging:
 spring:
   data:
      mongodb:
-       database: instagramm
+       database: bot
        username: root
        password: example
   rsocket:

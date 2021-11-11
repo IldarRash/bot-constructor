@@ -8,22 +8,24 @@ import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.security.core.context.ReactiveSecurityContextHolder
 import org.springframework.stereotype.Component
+import reactor.core.publisher.Mono
 
 @Component
 class UserSessionProvider(private val userRepository: UserRepository) {
 
-    suspend fun getCurrentUserOrNull(): User? = getCurrentUserSessionOrNull()?.user
+    fun getCurrentUserSessionOrFail() =
+            getCurrentUserSessionOrNull()
+                    .switchIfEmpty(Mono.error(InvalidRequestException("User", "current user is not login in")))
 
-    suspend fun getCurrentUserOrFail(): User = getCurrentUserSessionOrFail().user
-
-    suspend fun getCurrentUserSessionOrFail() =
-        getCurrentUserSessionOrNull() ?: throw InvalidRequestException("User", "current user is not login in")
-
-    suspend fun getCurrentUserSessionOrNull(): UserSession? {
-        val context = ReactiveSecurityContextHolder.getContext().awaitSingleOrNull() ?: return null
-        val tokenPrincipal = context.authentication.principal as TokenPrincipal
-        val user = userRepository.findById(tokenPrincipal.userId).awaitSingle()
-        return UserSession(user, tokenPrincipal.token)
+    fun getCurrentUserSessionOrNull(): Mono<UserSession?> {
+        return ReactiveSecurityContextHolder.getContext()
+                .flatMap {
+                    if (it.authentication == null)
+                        return@flatMap Mono.empty<UserSession>()
+                    val token = it.authentication.principal as TokenPrincipal
+                    return@flatMap userRepository.findById(token.userId)
+                            .map { UserSession(it, token.token) }
+                }
     }
 }
 

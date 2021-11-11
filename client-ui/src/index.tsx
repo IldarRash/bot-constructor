@@ -1,11 +1,10 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter } from "react-router-dom";
-import Login from "./component/Login";
+import FlowEditor from "./component/FlowEditor";
+import RegisterForm from "./component/RegisterForm";
 
 ReactDOM.render(
-    <BrowserRouter>
-        <Login history={""} />
-    </BrowserRouter>,
+    //<FlowEditor/>,
+    <RegisterForm/>,
     document.getElementById('root')
 );

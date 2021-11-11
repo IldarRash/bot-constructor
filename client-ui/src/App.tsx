@@ -2,11 +2,13 @@ import React from "react";
 import { Component } from "react";
 import { Route, Link } from "react-router-dom";
 import Login from "./component/Login";
+import ReactFlow from "react-flow-renderer";
 
 type Props = {};
 
 type State = {
 }
+
 
 class App extends Component<Props, State> {
     constructor(props: Props) {
@@ -34,9 +36,6 @@ class App extends Component<Props, State> {
                         </li>
                     </div>
                 </nav>
-                <div className="container mt-3">
-                    <Route path="/login" />
-                </div>
 
                 { /*<AuthVerify logOut={this.logOut}/> */}
             </div>
