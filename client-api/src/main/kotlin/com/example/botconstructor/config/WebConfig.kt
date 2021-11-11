@@ -1,6 +1,7 @@
 package com.example.botconstructor.config
 
 import com.example.botconstructor.api.UserHandler
+import kotlinx.coroutines.coroutineScope
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
@@ -25,7 +26,7 @@ class WebConfig : WebFluxConfigurer {
                 GET("/user", userHandler::getCurrentUser)
                 POST("/users", userHandler::signup)
                 POST("/users/login", userHandler::login)
-                PUT("/user")
+                PUT("/user", userHandler::updateUser)
             }
         }
     }

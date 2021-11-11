@@ -65,7 +65,7 @@ class UserHandler(
     }
 
 
-    fun invalidRequestExceptionHandler(e: InvalidRequestException): InvalidRequestExceptionResponse {
+    protected fun invalidRequestExceptionHandler(e: InvalidRequestException): InvalidRequestExceptionResponse {
         val subject = e.subject
         val violation = e.violation
         val errors = mapOf(subject to listOf(violation))
