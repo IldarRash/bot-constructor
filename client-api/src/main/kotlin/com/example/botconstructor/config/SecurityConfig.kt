@@ -1,4 +1,4 @@
-package com.example.botconstructor;
+package com.example.botconstructor.config;
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
