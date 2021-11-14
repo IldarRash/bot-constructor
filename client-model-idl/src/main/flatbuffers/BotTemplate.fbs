@@ -1,23 +1,35 @@
-namespace com.example.botconstructor;
+namespace com.example.botconstructor.fbs;
 
-enum BotType:byte { Instagram = 0, Vkontakte = 1, Telegram = 2 }
+enum NodeType:byte { StartDialog = 0, Dialog = 1, EndDialog = 2, Condition = 3, GetData = 4 }
 
-table Question {
-    question: string;
-    key_words: [string];
+table Edge {
+    id: int64;
+    target: int16;
+    source: int16;
 }
 
-table BotQuestions {
+table Button {
+    id: int32;
+    text: string;
+    target: int32;
+}
+
+table Node {
     id: int64;
-    questions: [Question];
+    text_message: string;
+    input_counts: int16;
+    output_counts: int16;
+    has_buttons: bool;
+    buttons: [Button];
+    attachment_url: string;
 }
 
 table BotTemplate {
     id: int64;
     name: string;
     owner_id: int64;
-    questions: BotQuestions;
-    type: BotType;
+    nodes: [Node];
+    edges: [Edge];
 }
 
 root_type BotTemplate;

@@ -1,10 +1,11 @@
-package com.example.botconstructor.services
+package com.example.botconstructor.user
 
-import com.example.botconstructor.dto.*
 import com.example.botconstructor.exceptions.InvalidRequestException
-import com.example.botconstructor.repos.UserRepository
-import com.example.botconstructor.repos.findByEmailOrFail
+import com.example.botconstructor.security.UserAuthenticationRequest
+import com.example.botconstructor.security.UserRegistrationRequest
 import com.example.botconstructor.security.UserTokenProvider
+import com.example.botconstructor.security.PasswordService
+import com.example.botconstructor.services.UserSession
 import org.springframework.stereotype.Component
 import reactor.core.publisher.Mono
 import reactor.util.function.Tuple2

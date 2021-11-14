@@ -1,6 +1,6 @@
-package com.example.botconstructor.dto
+package com.example.botconstructor.user
 
-import com.example.botconstructor.model.User
+import com.example.botconstructor.user.User
 
 data class UserView(
         val email: String,

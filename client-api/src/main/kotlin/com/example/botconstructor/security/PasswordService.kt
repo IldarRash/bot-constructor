@@ -1,4 +1,4 @@
-package com.example.botconstructor.services
+package com.example.botconstructor.security
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Component

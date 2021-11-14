@@ -1,7 +1,6 @@
-package com.example.botconstructor.repos
+package com.example.botconstructor.user
 
 import com.example.botconstructor.exceptions.InvalidRequestException
-import com.example.botconstructor.model.User
 import org.springframework.data.mongodb.repository.ReactiveMongoRepository
 import reactor.core.publisher.Mono
 

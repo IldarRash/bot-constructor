@@ -1,4 +1,4 @@
-package com.example.botconstructor.model
+package com.example.botconstructor.user
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document

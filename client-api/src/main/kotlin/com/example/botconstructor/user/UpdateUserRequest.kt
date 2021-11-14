@@ -1,15 +1,15 @@
-package com.example.botconstructor.dto
+package com.example.botconstructor.user
 
-import com.realworld.springmongo.validation.NotBlankOrNull
 import javax.validation.constraints.Email
+import javax.validation.constraints.NotBlank
 
 data class UpdateUserRequest(
         @field:Email
-        @field:NotBlankOrNull
+        @field:NotBlank
         val email: String?,
-        @field:NotBlankOrNull
+        @field:NotBlank
         val username: String?,
-        @field:NotBlankOrNull
+        @field:NotBlank
         val password: String?,
         val image: String?,
         val bio: String?,

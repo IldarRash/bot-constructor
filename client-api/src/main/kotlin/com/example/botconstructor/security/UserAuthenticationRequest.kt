@@ -1,4 +1,4 @@
-package com.example.botconstructor.dto
+package com.example.botconstructor.security
 
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
