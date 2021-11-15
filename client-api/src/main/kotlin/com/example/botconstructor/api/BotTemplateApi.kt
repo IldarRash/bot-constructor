@@ -1,6 +1,6 @@
 package com.example.botconstructor.api
 
-import com.example.botconstructor.bot_template.BotTemplate
+import com.example.botconstructor.model.BotTemplate
 import com.example.botconstructor.dto.Event
 import com.example.botconstructor.services.BotTemplateService
 import org.springframework.messaging.handler.annotation.MessageMapping
@@ -8,7 +8,6 @@ import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.stereotype.Controller
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import java.nio.ByteBuffer
 
 @Controller
 @MessageMapping("bot.template")

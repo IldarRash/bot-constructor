@@ -1,4 +1,4 @@
-package com.example.botconstructor.bot_template
+package com.example.botconstructor.model
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
@@ -21,11 +21,11 @@ data class Node(
 @Document
 class BotTemplate(
         @Id val id: String,
-        val name: String,
+        var name: String,
         val ownerId: String,
         var nodes: List<Node>,
         var edges: List<Edge>,
-        val empty: Boolean
+        var empty: Boolean
 ) {
 
     fun addNode(node: Node) {

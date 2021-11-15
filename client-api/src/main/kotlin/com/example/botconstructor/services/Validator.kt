@@ -1,6 +1,7 @@
-package com.example.botconstructor.bot_template
+package com.example.botconstructor.services
 
 import com.example.botconstructor.dto.*
+import com.example.botconstructor.model.BotTemplate
 import org.springframework.stereotype.Component
 
 data class Valid(val message: String, val valid: Boolean)

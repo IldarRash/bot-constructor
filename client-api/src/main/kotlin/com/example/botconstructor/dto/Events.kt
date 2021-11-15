@@ -1,6 +1,8 @@
 package com.example.botconstructor.dto
 
-import com.example.botconstructor.bot_template.Button
+import com.example.botconstructor.model.Button
+import com.example.botconstructor.model.Edge
+import com.example.botconstructor.model.Node
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 
@@ -36,12 +38,20 @@ data class NodeEvent(
     override fun getType(): EventType = EventType.NODE
 }
 
+fun NodeEvent.toNode() : Node {
+    return Node(id, textMessage, inputCounts, outputCounts, hasButtons, buttons, attachUrl)
+}
+
 data class EdgeEvent(
         val id: Int,
         val target: Short,
         val source: Short
 ) : Event {
     override fun getType(): EventType = EventType.EDGE
+}
+
+fun EdgeEvent.toEdge() : Edge {
+    return Edge(id, target, source)
 }
 
 data class TemplateEvent(
