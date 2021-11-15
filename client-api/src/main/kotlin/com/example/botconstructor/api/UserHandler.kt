@@ -1,8 +1,12 @@
-package com.example.botconstructor.user
+package com.example.botconstructor.api
 
+import com.example.botconstructor.dto.UpdateUserRequest
+import com.example.botconstructor.dto.UserView
+import com.example.botconstructor.dto.toUserView
 import com.example.botconstructor.exceptions.InvalidRequestException
 import com.example.botconstructor.security.UserAuthenticationRequest
 import com.example.botconstructor.security.UserRegistrationRequest
+import com.example.botconstructor.services.UserService
 import com.example.botconstructor.services.UserSessionProvider
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.server.ServerRequest

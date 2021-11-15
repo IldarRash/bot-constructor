@@ -1,0 +1,31 @@
+package com.example.botconstructor.bot_template
+
+import com.example.botconstructor.dto.*
+import org.springframework.stereotype.Component
+
+data class Valid(val message: String, val valid: Boolean)
+interface Validator<T : Event> {
+    fun validateEvent(data: T, botTemplate: BotTemplate): Pair<T, Valid>
+}
+
+@Component
+class EdgeValidator : Validator<EdgeEvent> {
+    override fun validateEvent(data: EdgeEvent, botTemplate: BotTemplate): Pair<EdgeEvent, Valid> {
+
+        return data to  Valid("", true)
+    }
+}
+
+@Component
+class NodeValidator : Validator<NodeEvent> {
+    override fun validateEvent(data: NodeEvent, botTemplate: BotTemplate): Pair<NodeEvent, Valid> {
+        return data to Valid("", true)
+    }
+}
+
+@Component
+class TemplateValidator : Validator<TemplateEvent> {
+    override fun validateEvent(data: TemplateEvent, botTemplate: BotTemplate): Pair<TemplateEvent, Valid> {
+        return data to Valid("", true)
+    }
+}

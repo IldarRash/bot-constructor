@@ -1,6 +1,6 @@
 package com.example.botconstructor.security
 
-import com.example.botconstructor.user.User
+import com.example.botconstructor.model.User
 import javax.validation.constraints.Email
 import javax.validation.constraints.NotBlank
 

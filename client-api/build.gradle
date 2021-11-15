@@ -1,4 +1,4 @@
-import io.netifi.flatbuffers.plugin.tasks.FlatBuffers
+
 
 plugins {
     id "org.springframework.boot"
@@ -15,8 +15,6 @@ configurations {
 }
 
 dependencies {
-    flatbuf(project(":client-model-idl"))
-
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-rsocket")
     implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
@@ -43,28 +41,3 @@ dependencies {
 test {
     useJUnitPlatform()
 }
-
-flatbuffers {
-    flatBuffersVersion = '2.0.0'
-}
-
-processResources {
-    dependsOn configurations.flatbuf
-    configurations.flatbuf.files.each {
-        from(zipTree(it).matching {
-            include "*.fbs"
-        })
-    }
-}
-
-task createFlatBuffers(type: FlatBuffers, dependsOn: ['processResources']) {
-    language = 'kotlin'
-    inputDir = file("$buildDir/resources/main")
-    outputDir = file("$buildDir/generated/sources/flatbuffers/java/main")
-    extraArgs = "--gen-mutable"
-}
-
-compileKotlin {
-    dependsOn createFlatBuffers
-}
-

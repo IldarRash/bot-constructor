@@ -1,6 +1,6 @@
 package com.example.botconstructor.config
 
-import com.example.botconstructor.user.UserHandler
+import com.example.botconstructor.api.UserHandler
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration

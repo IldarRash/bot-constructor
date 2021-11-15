@@ -1,7 +1,8 @@
-package com.example.botconstructor.model
+package com.example.botconstructor.bot_template
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
+import java.util.*
 
 data class Button(val id: Int, val text: String, val target: Int)
 
@@ -19,13 +20,12 @@ data class Node(
 
 @Document
 class BotTemplate(
-        @Id val id: Long,
+        @Id val id: String,
         val name: String,
         val ownerId: String,
         var nodes: List<Node>,
-        var edges: List<Edge>
-
-
+        var edges: List<Edge>,
+        val empty: Boolean
 ) {
 
     fun addNode(node: Node) {
@@ -58,5 +58,18 @@ class BotTemplate(
         result = 31 * result + nodes.hashCode()
         result = 31 * result + edges.hashCode()
         return result
+    }
+
+    companion object {
+        fun empty(name: String, ownerId: String): BotTemplate {
+            return BotTemplate(
+                    UUID.randomUUID().toString(),
+                    name,
+                    ownerId,
+                    emptyList(),
+                    emptyList(),
+                    true
+            )
+        }
     }
 }
