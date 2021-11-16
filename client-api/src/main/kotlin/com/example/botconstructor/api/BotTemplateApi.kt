@@ -3,6 +3,7 @@ package com.example.botconstructor.api
 import com.example.botconstructor.model.BotTemplate
 import com.example.botconstructor.dto.Event
 import com.example.botconstructor.services.BotTemplateService
+import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.stereotype.Controller
@@ -19,8 +20,8 @@ class BotTemplateApi(val botService: BotTemplateService) {
         return botService.newTemplate(name)
     }
 
-    @MessageMapping("edit")
-    fun editTempalte(events: Flux<Event>): Flux<Event> {
-        return botService.editTemplate(events)
+    @MessageMapping("{id}.edit")
+    fun editTempalte(@DestinationVariable("id") id: String, events: Flux<Event>): Flux<Event> {
+        return botService.editTemplate(events, id)
     }
 }

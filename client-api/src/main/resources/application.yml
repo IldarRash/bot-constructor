@@ -14,6 +14,7 @@ spring:
     server:
       mapping-path: /rsocket
       transport: websocket
+
   web:
     resources:
       chain:

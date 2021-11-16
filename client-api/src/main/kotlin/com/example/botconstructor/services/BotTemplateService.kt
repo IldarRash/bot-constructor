@@ -29,7 +29,7 @@ class BotTemplateService(
 
 
     fun editTemplate(events: Flux<Event>, id: String): Flux<Event> {
-        if (!mapUsersTemplateActive.contains(id))
+        if (!mapUsersTemplateActive.containsKey(id))
             return Flux.fromIterable(
                     listOf(ErrorEvent(id, "Template doesnt fount", EventType.ERROR))
             )
