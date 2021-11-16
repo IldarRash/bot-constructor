@@ -12,8 +12,13 @@ interface Validator<T : Event> {
 @Component
 class EdgeValidator : Validator<EdgeEvent> {
     override fun validateEvent(data: EdgeEvent, botTemplate: BotTemplate): Pair<EdgeEvent, Valid> {
-
-        return data to  Valid("", true)
+        val check = botTemplate.edges.stream()
+                .filter { it == data.toEdge() }
+                .findAny()
+        if (check.isPresent) {
+            return data to Valid("Такая нода уже есть", false)
+        }
+        return data to Valid("", true)
     }
 }
 

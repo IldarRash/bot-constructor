@@ -3,6 +3,7 @@ package com.example.botconstructor.dto
 import com.example.botconstructor.model.Button
 import com.example.botconstructor.model.Edge
 import com.example.botconstructor.model.Node
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonSubTypes
 import com.fasterxml.jackson.annotation.JsonTypeInfo
 
@@ -14,15 +15,17 @@ enum class EditType {
     SAVE, CLOSE
 }
 
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "EventType")
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes(
-        JsonSubTypes.Type(value = NodeEvent::class, name = "NODE"),
-        JsonSubTypes.Type(value = ErrorEvent::class, name = "ERROR"),
-        JsonSubTypes.Type(value = EdgeEvent::class, name = "EDGE"),
-        JsonSubTypes.Type(value = TemplateEvent::class, name = "TEMPLATE"),
-        JsonSubTypes.Type(value = EmptyEvent::class, name = "EMPTY"),
+        JsonSubTypes.Type(value = NodeEvent::class, name = "node"),
+        JsonSubTypes.Type(value = ErrorEvent::class, name = "error"),
+        JsonSubTypes.Type(value = EdgeEvent::class, name = "edge"),
+        JsonSubTypes.Type(value = TemplateEvent::class, name = "template"),
+        JsonSubTypes.Type(value = EmptyEvent::class, name = "empty"),
 )
 interface Event {
+
+    @JsonIgnore
     fun getType(): EventType
 }
 
@@ -64,8 +67,7 @@ data class TemplateEvent(
 
 data class ErrorEvent(
         val id: String,
-        val message: String,
-        val errorType: EventType
+        val message: String
 ) : Event {
     override fun getType(): EventType = EventType.ERROR
 }

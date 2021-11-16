@@ -6,7 +6,24 @@ import java.util.*
 
 data class Button(val id: Int, val text: String, val target: Int)
 
-data class Edge(val id: Int, val target: Short, val source: Short)
+data class Edge(val id: Int, val target: Short, val source: Short) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Edge
+
+        if (target != other.target) return false
+        if (source != other.source) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        val result = target.toInt();
+        return (31 * result + source)
+    }
+}
 
 data class Node(
         val id: Int,

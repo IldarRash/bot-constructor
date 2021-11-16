@@ -31,7 +31,7 @@ class BotTemplateService(
     fun editTemplate(events: Flux<Event>, id: String): Flux<Event> {
         if (!mapUsersTemplateActive.containsKey(id))
             return Flux.fromIterable(
-                    listOf(ErrorEvent(id, "Template doesnt fount", EventType.ERROR))
+                    listOf(ErrorEvent(id, "Template doesnt fount"))
             )
 
         val template: BotTemplate = mapUsersTemplateActive[id]!!
@@ -42,7 +42,7 @@ class BotTemplateService(
                     if (it!!.second.valid) {
                         EmptyEvent()
                     } else {
-                        ErrorEvent(template.id, it.second.message, it.first.getType())
+                        ErrorEvent(template.id, it.second.message)
                     }
                 }
                 .doOnTerminate {
