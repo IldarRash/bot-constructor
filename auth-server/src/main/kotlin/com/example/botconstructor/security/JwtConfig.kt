@@ -1,4 +1,4 @@
-package com.example.botconstructor
+package com.example.botconstructor.security
 
 import com.example.botconstructor.exceptions.InvalidRequestException
 import org.springframework.context.annotation.Bean

@@ -1,4 +1,4 @@
-package com.example.botconstructor
+package com.example.botconstructor.security
 
 import com.example.botconstructor.security.UserTokenProvider
 import io.jsonwebtoken.Claims

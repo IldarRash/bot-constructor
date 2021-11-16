@@ -3,7 +3,7 @@ import {
   MESSAGE_RSOCKET_COMPOSITE_METADATA,
   RSocketClient
 } from "rsocket-core";
-import {BufferEncoders, JsonSerializers} from "rsocket-core/build";
+import {BufferEncoders} from "rsocket-core/build";
 
 function urlFromLocation() {
   const port = window.location.port ? `:${window.location.port}` : "";

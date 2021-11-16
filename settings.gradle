@@ -4,7 +4,7 @@ include("bot-api")
 include("client-api")
 include("bots-model-idl")
 include("client-model-idl")
-include("client-uisrc")
+include("client-ui")
 
 rootProject.name = "bot-constructor"
 

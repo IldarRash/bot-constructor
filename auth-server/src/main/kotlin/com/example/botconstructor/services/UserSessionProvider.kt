@@ -1,6 +1,6 @@
 package com.example.botconstructor.services
 
-import com.example.botconstructor.TokenPrincipal
+import com.example.botconstructor.security.TokenPrincipal
 import com.example.botconstructor.exceptions.InvalidRequestException
 import com.example.botconstructor.model.User
 import com.example.botconstructor.repositories.UserRepository
