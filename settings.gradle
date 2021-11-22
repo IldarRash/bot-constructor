@@ -1,10 +1,11 @@
+rootProject.name = "bot-constructor"
+
 include("gateway")
 include("auth-server")
 include("bot-api")
 include("client-api")
 include("bots-model-idl")
 include("client-model-idl")
+include("bot-creator-answer")
 include("client-ui")
-
-rootProject.name = "bot-constructor"
 
