@@ -44,14 +44,3 @@ class BotController(
 
 
 }
-
-fun main() {
-    val fileName = "/Users/irshaya5/IdeaProjects/bot-constructor/bot-api/src/main/kotlin/com/example/botconstructor/api/new.txt"
-    val linesLength = File(fileName).length()
-    val lines = File(fileName).readLines().size
-    print("$linesLength $lines")
-}
-
-fun square(value: Int, context: Any, continuation: (Int, Any) -> Unit) {
-    continuation(value * value, context)
-}
