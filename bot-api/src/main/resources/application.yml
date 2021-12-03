@@ -4,14 +4,6 @@ logging:
   level:
     root: info
 
-io.rsocket.broker.client:
-  route-id: 00000000-0000-0000-0000-000000000002
-  service-name: bot-api
-  tags:
-    INSTANCE_NAME: bot-api
-  brokers:
-    - tcp://localhost:8002
-
 spring:
   data:
     mongodb:
@@ -21,7 +13,7 @@ spring:
   rsocket:
     server:
       mapping-path: /rsocket
-      transport: tcp
+      transport: websocket
   web:
     resources:
       chain:

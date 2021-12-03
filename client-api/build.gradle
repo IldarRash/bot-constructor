@@ -1,9 +1,7 @@
 
-
 plugins {
     id "org.springframework.boot"
     id "io.spring.dependency-management"
-    id "io.netifi.flatbuffers"
     id "org.jetbrains.kotlin.jvm"
     id "org.jetbrains.kotlin.plugin.spring"
 }
@@ -12,6 +10,10 @@ sourceCompatibility = JavaVersion.VERSION_11
 
 configurations {
     flatbuf
+}
+
+repositories {
+    maven { url "https://jitpack.io" }
 }
 
 dependencies {
@@ -27,11 +29,9 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+
     testImplementation("io.mockk:mockk:1.12.0")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
-}
-
-test {
-    useJUnitPlatform()
 }

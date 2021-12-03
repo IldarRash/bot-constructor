@@ -1,14 +1,12 @@
 package com.example.botconstructor.services
 
-/*
-import com.elbekD.bot.Bot
-import com.elbekD.bot.feature.chain.chain
+
 import org.springframework.stereotype.Service
 import java.util.concurrent.ConcurrentHashMap
 
 @Service
 class TelegramBotService {
-    private val botMap = ConcurrentHashMap<String, Bot>()
+    /*private val botMap = ConcurrentHashMap<String, Bot>()
 
     fun startBot(token: String, botTemplate: String) {
         val bot = Bot.createPolling(botTemplate, token)
@@ -22,5 +20,9 @@ class TelegramBotService {
     }
 
     fun stopBot(botId: String)  = botMap[botId]?.stop()
+
+    fun createChainFromTemplate() = {
+        TODO("Create Chain")
+    }*/
 }
-*/
+

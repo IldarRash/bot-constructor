@@ -3,16 +3,15 @@ package com.example.botconstructor.api
 import com.example.botconstructor.model.Bot
 import com.example.botconstructor.repositories.BotAnswerRepositories
 import com.example.botconstructor.services.AnswerTemplateService
-import io.rsocket.broker.client.spring.BrokerRSocketRequester
 import org.springframework.http.MediaType
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.Payload
 import org.springframework.messaging.rsocket.RSocketRequester
+import org.springframework.messaging.rsocket.annotation.ConnectMapping
 import org.springframework.stereotype.Controller
 import org.springframework.web.reactive.function.client.ClientResponse
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
-import java.io.File
 
 @Controller
 @MessageMapping("bot.authorize")
@@ -21,14 +20,20 @@ class BotController(
         val instagramClient: WebClient,
         val answerTemplateService: AnswerTemplateService,
         val botAnswerRepositories: BotAnswerRepositories,
-        val brokerRSocketRequester: BrokerRSocketRequester
 ) {
+
+    @ConnectMapping("connect")
+    fun connect(rSocketRequester: RSocketRequester,
+                @Payload  clientId: String) {
+        println(clientId)
+        Mono.empty<Void>()
+    }
 
     @MessageMapping("telegram")
     fun telegramAuthorize(@Payload token: String, requester: RSocketRequester): Mono<String> {
         return telegramClient.get()
                 .uri {
-                    it.path("bot$token/getMe").build()
+                    it.path("bot${token}/getMe").build()
                 }
                 .accept(MediaType.APPLICATION_JSON)
                 .exchangeToMono {

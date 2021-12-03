@@ -1,6 +1,6 @@
 package com.example.botconstructor.services
 
-import com.example.botconstructor.BotEvent
+import com.example.botconstructor.dto.BotEvent
 import org.springframework.stereotype.Service
 import org.thymeleaf.context.Context
 import org.thymeleaf.spring5.SpringTemplateEngine

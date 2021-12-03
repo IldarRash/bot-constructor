@@ -13,17 +13,9 @@ spring:
   rsocket:
     server:
       mapping-path: /rsocket
-      transport: tcp
+      transport: websocket
 
   web:
     resources:
       chain:
         cache: false
-
-io.rsocket.broker.client:
-  route-id: 00000000-0000-0000-0000-000000000003
-  service-name: client-api
-  tags:
-    INSTANCE_NAME: client-api
-  brokers:
-    - tcp://localhost:8002

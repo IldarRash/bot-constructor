@@ -1,9 +1,8 @@
 package com.example.botconstructor.api
 
-import com.example.botconstructor.model.BotTemplate
 import com.example.botconstructor.dto.Event
+import com.example.botconstructor.model.BotTemplate
 import com.example.botconstructor.services.BotTemplateService
-import io.rsocket.broker.client.spring.BrokerRSocketRequester
 import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.Payload
@@ -17,12 +16,11 @@ class BotTemplateApi(val botService: BotTemplateService) {
 
     @MessageMapping("new")
     fun newTemplate(@Payload name: String): Mono<BotTemplate> {
-
         return botService.newTemplate(name)
     }
 
     @MessageMapping("{id}.edit")
-    fun editTempalte(@DestinationVariable("id") id: String, events: Flux<Event>): Flux<Event> {
+    fun editTemplate(@DestinationVariable("id") id: String, events: Flux<Event>): Flux<Event> {
         return botService.editTemplate(events, id)
     }
 }
