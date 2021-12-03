@@ -3,6 +3,7 @@ package com.example.botconstructor.config
 import com.example.botconstructor.api.InstagramWebhookHandler
 import com.example.botconstructor.api.TelegramWebhookHandler
 import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.MediaType
@@ -44,13 +45,16 @@ class WebApiConfig(val telegramProps: TelegramProps, val instagramProps: Instagr
             }
         }
     }
+
+
 }
 
 
-@Configuration
+@ConstructorBinding
 @ConfigurationProperties(prefix = "bot.api.telegram")
-data class TelegramProps(val host: String, val timeout: Int)
+data class TelegramProps(
+    val host: String, val timeout: Int)
 
-@Configuration
+@ConstructorBinding
 @ConfigurationProperties(prefix = "bot.api.instagram")
 data class InstagramProps(val host: String, val timeout: Int)

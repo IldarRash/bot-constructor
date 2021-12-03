@@ -3,6 +3,7 @@ package com.example.botconstructor.api
 import com.example.botconstructor.model.BotTemplate
 import com.example.botconstructor.dto.Event
 import com.example.botconstructor.services.BotTemplateService
+import io.rsocket.broker.client.spring.BrokerRSocketRequester
 import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.Payload

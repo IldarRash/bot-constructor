@@ -1,11 +1,13 @@
 package com.example.botconstructor
 
 import org.springframework.boot.autoconfigure.SpringBootApplication
+import org.springframework.boot.context.properties.ConfigurationPropertiesScan
 import org.springframework.boot.runApplication
 
 @SpringBootApplication
-class BotCreateAnswerApplication
+@ConfigurationPropertiesScan
+class BotApiApplication
 
 fun main(args: Array<String>) {
-    runApplication<BotCreateAnswerApplication>(*args)
+    runApplication<BotApiApplication>(*args)
 }

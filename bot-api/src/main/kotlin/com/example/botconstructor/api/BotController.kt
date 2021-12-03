@@ -3,6 +3,7 @@ package com.example.botconstructor.api
 import com.example.botconstructor.model.Bot
 import com.example.botconstructor.repositories.BotAnswerRepositories
 import com.example.botconstructor.services.AnswerTemplateService
+import io.rsocket.broker.client.spring.BrokerRSocketRequester
 import org.springframework.http.MediaType
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.Payload
@@ -19,7 +20,8 @@ class BotController(
         val telegramClient: WebClient,
         val instagramClient: WebClient,
         val answerTemplateService: AnswerTemplateService,
-        val botAnswerRepositories: BotAnswerRepositories
+        val botAnswerRepositories: BotAnswerRepositories,
+        val brokerRSocketRequester: BrokerRSocketRequester
 ) {
 
     @MessageMapping("telegram")

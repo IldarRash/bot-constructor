@@ -1,8 +1,16 @@
 server:
-  port: 9000
+  port: 9003
 logging:
   level:
     root: info
+
+io.rsocket.broker.client:
+  route-id: 00000000-0000-0000-0000-000000000002
+  service-name: bot-api
+  tags:
+    INSTANCE_NAME: bot-api
+  brokers:
+    - tcp://localhost:8002
 
 spring:
   data:
@@ -13,8 +21,7 @@ spring:
   rsocket:
     server:
       mapping-path: /rsocket
-      transport: websocket
-
+      transport: tcp
   web:
     resources:
       chain:
