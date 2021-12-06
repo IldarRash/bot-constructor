@@ -1,0 +1,16 @@
+plugins {
+    id "org.jetbrains.kotlin.jvm"
+}
+
+sourceCompatibility = JavaVersion.VERSION_11
+
+dependencies {
+    implementation project(':commons')
+    implementation("io.projectreactor.addons:reactor-pool")
+
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+}
+
+task wrapper(type: Wrapper){
+    gradleVersion = '7.2'
+}

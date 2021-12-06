@@ -5,6 +5,9 @@ logging:
     root: info
 
 spring:
+  application:
+    id: ""
+    name: bot_api${spring.application.id}
   data:
     mongodb:
       database: bot
@@ -18,7 +21,12 @@ spring:
     resources:
       chain:
         cache: false
-
+  cloud:
+    consul:
+      discovery:
+        instance-group: bot_api
+        service-name: bot_api
+        instance-id: bot_${spring.application.id}
 bot:
   api:
     telegram:
@@ -27,3 +35,4 @@ bot:
     instagram:
       host: https://graph.facebook.com/v9.0/
       timeout: 500
+

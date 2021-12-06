@@ -7,6 +7,7 @@ plugins {
 }
 
 subprojects {
+    apply plugin: "java"
     apply plugin: "kotlin"
     apply plugin: "kotlin-spring"
     apply plugin: "kotlin-kapt"
@@ -16,11 +17,37 @@ subprojects {
     repositories {
         mavenCentral()
         maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local' }
+        maven { url 'https://repo.spring.io/milestone' }
+        maven { url 'https://repo.spring.io/snapshot' }
     }
 
     dependencyManagement {
         dependencies {
             dependency("io.micrometer.prometheus:prometheus-rsocket-spring:1.3.0")
+        }
+    }
+    dependencies {
+
+        implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
+        implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
+        implementation("org.jetbrains.kotlin:kotlin-reflect")
+        implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+
+        implementation("org.springframework.boot:spring-boot-starter-actuator")
+        implementation("org.springframework.boot:spring-boot-starter-rsocket")
+        implementation("io.projectreactor.addons:reactor-extra")
+        implementation("org.springframework.boot:spring-boot-starter-data-mongodb-reactive")
+
+        [
+                enforcedPlatform('org.springframework.boot:spring-boot-dependencies:2.5.5'),
+                platform('org.junit:junit-bom:5.4.0'),
+                platform('io.projectreactor:reactor-bom:2020.0.11'),
+                platform('io.github.resilience4j:resilience4j-bom:1.7.0'),
+        ].each {
+            implementation it
+            annotationProcessor it
+            testAnnotationProcessor it
         }
     }
 

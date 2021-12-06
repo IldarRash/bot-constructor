@@ -1,5 +1,6 @@
 package com.example.botconstructor.api
 
+import com.example.botconstructor.TelegramTemplate
 import org.springframework.messaging.rsocket.RSocketRequester
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -15,7 +16,7 @@ class BotCreateController(val rSocketRequester: RSocketRequester) {
     fun authTelegram(@RequestBody token: String) {
         rSocketRequester.route(
             "bot.authorize.telegram"
-        ).data(token)
+        ).data(TelegramTemplate(token))
             .retrieveMono(Boolean.javaClass)
             .subscribe()
     }

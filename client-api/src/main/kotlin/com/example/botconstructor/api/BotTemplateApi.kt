@@ -6,6 +6,8 @@ import com.example.botconstructor.services.BotTemplateService
 import org.springframework.messaging.handler.annotation.DestinationVariable
 import org.springframework.messaging.handler.annotation.MessageMapping
 import org.springframework.messaging.handler.annotation.Payload
+import org.springframework.messaging.rsocket.RSocketRequester
+import org.springframework.messaging.rsocket.annotation.ConnectMapping
 import org.springframework.stereotype.Controller
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
@@ -13,6 +15,13 @@ import reactor.core.publisher.Mono
 @Controller
 @MessageMapping("bot.template")
 class BotTemplateApi(val botService: BotTemplateService) {
+
+
+
+    @MessageMapping("event")
+    fun getEvent(@Payload event: String, rSocketRequester: RSocketRequester) =
+        Mono.error<java.lang.RuntimeException>(RuntimeException())
+
 
     @MessageMapping("new")
     fun newTemplate(@Payload name: String): Mono<BotTemplate> {

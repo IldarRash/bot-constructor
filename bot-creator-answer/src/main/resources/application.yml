@@ -18,3 +18,10 @@ spring:
     resources:
       chain:
         cache: false
+
+rsocket:
+  host: localhost
+  port: 9001
+  rpath: /rsocket
+  type: bot_answer
+  path: bot.api
