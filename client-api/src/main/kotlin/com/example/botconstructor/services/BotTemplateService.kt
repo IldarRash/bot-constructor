@@ -1,5 +1,6 @@
 package com.example.botconstructor.services
 
+import com.example.botconstructor.BroadCast
 import com.example.botconstructor.dto.EmptyEvent
 import com.example.botconstructor.dto.ErrorEvent
 import com.example.botconstructor.dto.Event
@@ -17,13 +18,15 @@ class BotTemplateService(
         val validators: Map<EventType, Validator<Event>>,
         val editors: Map<EventType, Editor<Event>>
 ) {
+
     val mapUsersTemplateActive = ConcurrentHashMap<String, BotTemplate>()
+    val listeners = ConcurrentHashMap<String, BroadCast<Event>>()
 
     fun newTemplate(name: String): Mono<BotTemplate> {
 
         val emptyTemplate = BotTemplate.empty(name, "ildar")
-        mapUsersTemplateActive.put(emptyTemplate.id, emptyTemplate)
-
+        mapUsersTemplateActive[emptyTemplate.id] = emptyTemplate
+        listeners[emptyTemplate.id] = BroadCast()
         return Mono.just(emptyTemplate)
     }
 
@@ -34,20 +37,23 @@ class BotTemplateService(
                     listOf(ErrorEvent(id, "Template doesnt fount"))
             )
 
+        if (!listeners.containsKey(id))
+            listeners[id] = BroadCast()
+
         val template: BotTemplate = mapUsersTemplateActive[id]!!
-        return events
-                .map { validators[it.getType()]?.validateEvent(it, template) }
-                .map { editors[it!!.first.getType()]?.editTemplate(it, template) }
-                .map {
-                    if (it!!.second.valid) {
-                        EmptyEvent()
-                    } else {
-                        ErrorEvent(template.id, it.second.message)
-                    }
+        return listeners[id]!!.listener<Event>().mergeWith(events)
+            .map { validators[it.getType()]?.validateEvent(it, template) }
+            .map { editors[it!!.first.getType()]?.editTemplate(it, template) }
+            .map {
+                if (it!!.second.valid) {
+                    EmptyEvent()
+                } else {
+                    ErrorEvent(template.id, it.second.message)
                 }
-                .doOnTerminate {
-                    botTemplateRepository.save(template).subscribe()
-                }
+            }
+            .doOnTerminate {
+                botTemplateRepository.save(template).subscribe()
+            }
 
     }
 }

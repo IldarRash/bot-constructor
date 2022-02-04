@@ -1,10 +1,6 @@
 rootProject.name = "bot-constructor"
 
-include("auth-server")
-include("bot-api")
 include("client-api")
-include("bot-creator-answer")
-include("client-ui")
 include("commons")
 include("rsocket-auto")
 

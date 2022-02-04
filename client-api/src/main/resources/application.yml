@@ -1,5 +1,5 @@
 server:
-  port: 9002
+  port: 9000
 logging:
   level:
     root: info
@@ -17,10 +17,3 @@ spring:
     resources:
       chain:
         cache: false
-
-rsocket:
-  host: localhost
-  port: 9091
-  rpath: /rsocket
-  type: client_api
-  path: bot.api
