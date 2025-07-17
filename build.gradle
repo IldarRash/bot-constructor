@@ -1,53 +1,59 @@
 plugins {
-    id "org.springframework.boot" version "30.20apply false
-    id "io.spring.dependency-management" version "10.14apply false
-    id "io.netifi.flatbuffers" version "107apply false
-    id com.github.node-gradle.node" version "301apply false
-    id org.jetbrains.kotlin.jvm version "1.9.20apply false
-    id org.jetbrains.kotlin.plugin.spring version "1.9.20ply false
+    id "org.springframework.boot" version "3.3.0" apply false
+    id "io.spring.dependency-management" version "1.1.7" apply false
+    id "io.netifi.flatbuffers" version "1.0.7" apply false
+    id "com.github.node-gradle.node" version "7.1.0" apply false
+    id "org.jetbrains.kotlin.jvm" version "2.0.0" apply false
+    id "org.jetbrains.kotlin.plugin.spring" version "2.0.0" apply false
 }
 
-group = "com.exampleversion = 0.0.1SHOT"
+group = "com.example"
+version = "0.0.1-SNAPSHOT"
 
-allprojects [object Object]   repositories {
+allprojects {
+    repositories {
         mavenCentral()
     }
 }
 
-repositories [object Object]   mavenCentral()
-    maven [object Object]url https://oss.jfrog.org/artifactory/oss-snapshot-local }
+repositories {
+    mavenCentral()
+    maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local' }
 }
 
-subprojects [object Object]
+subprojects {
     apply plugin: "io.spring.dependency-management"
 
     repositories {
         mavenCentral()
-        maven [object Object]url https://oss.jfrog.org/artifactory/oss-snapshot-local' }
+        maven { url 'https://oss.jfrog.org/artifactory/oss-snapshot-local' }
     }
 
-    dependencyManagement[object Object]        imports {
-            mavenBom "org.springframework.cloud:spring-cloud-dependencies:2023
+    dependencyManagement {
+        imports {
+            mavenBom "org.springframework.cloud:spring-cloud-dependencies:2023.0.0"
         }
         dependencies {
-            dependency("io.micrometer.prometheus:prometheus-rsocket-spring:1.30)
+            dependency("io.micrometer.prometheus:prometheus-rsocket-spring:1.3.0")
         }
     }
 }
 
-subprojects [object Object]
-    apply plugin: kotlin
-    apply plugin: "kotlin-spring
-    apply plugin:kotlin-kapt
-    apply plugin: "org.springframework.boot
+subprojects {
+    apply plugin: 'kotlin'
+    apply plugin: "kotlin-spring"
+    apply plugin: 'kotlin-kapt'
+    apply plugin: "org.springframework.boot"
     apply plugin: "io.spring.dependency-management"
 
     compileKotlin {
-        kotlinOptions [object Object]      freeCompilerArgs += -Xjsr305=strict"
-            jvmTarget = 17
+        kotlinOptions {
+            freeCompilerArgs += "-Xjsr305=strict"
+            jvmTarget = "17"
         }
     }
 
-    test [object Object]  useJUnitPlatform()
+    test {
+        useJUnitPlatform()
     }
 }

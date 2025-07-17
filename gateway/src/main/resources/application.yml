@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: gateway
+  cloud:
+    gateway:
+      rsocket:
+        routing:
+          route-id: client-api
+          service-name: client-api
+server:
+  port: 8080 

@@ -4,13 +4,14 @@ import org.springframework.data.annotation.Id
 import org.springframework.data.mongodb.core.mapping.Document
 
 @Document
-class User(
-        @Id val id: String,
-        var username: String,
+data class User(
+        val username: String,
+        val email: String,
         var encodedPassword: String,
-        var email: String,
-        var bio: String? = null,
-        var image: String? = null,
+        val bio: String?,
+        val image: String?,
+        @Id
+        val id: String,
 ) {
 
 
