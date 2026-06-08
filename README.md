@@ -1,61 +1,95 @@
 # Bot Constructor
 
-This project is a constructor for creating bots. It consists of several modules:
+> A microservice platform for visually building and managing bots, with an RSocket API gateway fronting Spring Boot services and a React UI.
 
-- `client-api`: The main backend service that provides an API for managing users and bots.
-- `gateway`: An API gateway that uses RSocket to route requests to the appropriate services.
-- `auth-server`: A service for authenticating users.
-- `client-ui`: A React-based frontend for creating and managing bots.
+![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3-6DB33F?logo=springboot&logoColor=white)
+![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-Gateway-6DB33F?logo=spring&logoColor=white)
+![RSocket](https://img.shields.io/badge/RSocket-transport-1f6feb)
+![FlatBuffers](https://img.shields.io/badge/FlatBuffers-IDL-009688)
+![React](https://img.shields.io/badge/React-UI-61DAFB?logo=react&logoColor=black)
+![Gradle](https://img.shields.io/badge/Gradle-multi--module-02303A?logo=gradle&logoColor=white)
+![Java](https://img.shields.io/badge/Java-17-007396?logo=openjdk&logoColor=white)
 
-## Prerequisites
+## What & why
 
-- Java 17 or higher
-- Node.js 14 or higher
-- npm 6 or higher
+Bot Constructor is a constructor for creating bots, split into independent backend services behind an API gateway. The gateway uses **RSocket** to route requests to the appropriate services, authentication is isolated in a dedicated `auth-server`, and bot/template data models are defined once as **FlatBuffers** schemas (`bots-model-idl`, `client-model-idl`) so producers and consumers share a single binary contract. A React frontend (`client-ui`) lets users create and manage bots. The split keeps auth, routing, and the client API independently buildable and deployable.
 
-## Getting Started
+## Architecture
 
-To get started with the project, you'll need to build the backend and install the frontend dependencies.
+```text
+        ┌────────────┐        ┌──────────────┐
+        │ client-ui  │  HTTP  │   gateway    │   API gateway
+        │  (React)   │ ─────▶ │  (RSocket    │   routes requests to services
+        └────────────┘        │   routing)   │
+                              └──────┬───────┘
+                       ┌─────────────┼──────────────┐
+                       ▼             ▼              ▼
+              ┌──────────────┐ ┌────────────┐ ┌────────────┐
+              │ auth-server  │ │ client-api │ │  bot-api   │
+              │  (authn)     │ │ users/bots │ │ (planned)  │
+              └──────────────┘ └────────────┘ └────────────┘
 
-### Backend
+  Shared binary contracts (FlatBuffers IDL):
+    bots-model-idl    — schema for bot events
+    client-model-idl  — schema for bot templates
+```
 
-To build the backend, run the following command from the root directory:
+- **gateway** — API gateway; uses RSocket to route requests to the backend services.
+- **auth-server** — handles user authentication.
+- **client-api** — the main API for managing users and bots.
+- **bot-api** — bot-specific logic (to be implemented).
+- **client-ui** — React-based UI for creating and managing bots.
+- **bots-model-idl / client-model-idl** — FlatBuffers schemas shared across services.
+
+Built on Spring Boot 3.3 with Spring Cloud, Kotlin 2.0 (JVM target 17), and Prometheus RSocket metrics.
+
+## Getting started
+
+### Prerequisites
+
+- Java 17+
+- Node.js 14+ and npm 6+ (for `client-ui`)
+- Docker / Docker Compose (optional, to run the full stack)
+
+### Build the backend
 
 ```bash
 ./gradlew build
 ```
 
-### Frontend
-
-To install the frontend dependencies, navigate to the `client-ui` directory and run:
+### Run the frontend
 
 ```bash
+cd client-ui
 npm install
-```
-
-To start the frontend development server, run:
-
-```bash
 npm start
 ```
 
-## Running the Application
+### Run everything with Docker Compose
 
-To run the application, you'll need to start each of the services.
+```bash
+docker compose up --build
+```
 
-- `client-api`: Can be run from your IDE or by executing the generated JAR file.
-- `gateway`: Can be run from your IDE or by executing the generated JAR file.
-- `auth-server`: Can be run from your IDE or by executing the generated JAR file.
-- `client-ui`: Can be run with `npm start`.
+| Service     | Port |
+|-------------|------|
+| gateway     | 8080 |
+| auth-server | 8081 |
+| client-api  | 8082 |
+| client-ui   | 3000 |
 
-## Project Structure
+Individual backend services can also be run from your IDE or via their generated JARs.
 
-The project is a multi-module Gradle project. The main modules are:
+## Project structure
 
-- `bots-model-idl`: Contains the FlatBuffers schema for bot events.
-- `client-model-idl`: Contains the FlatBuffers schema for bot templates.
-- `auth-server`: Handles user authentication.
-- `bot-api`: (To be implemented) Will handle bot-specific logic.
-- `client-api`: The main API for the client.
-- `client-ui`: The React-based user interface.
-- `gateway`: The API gateway. 
+```text
+gateway/           Spring Cloud API gateway (RSocket routing)
+auth-server/       user authentication service
+client-api/        main client API (users + bots)
+bot-api/           bot-specific logic (to be implemented)
+bots-model-idl/    FlatBuffers schema for bot events
+client-model-idl/  FlatBuffers schema for bot templates
+client-ui/         React frontend
+docker-compose.yml full-stack local run
+```
