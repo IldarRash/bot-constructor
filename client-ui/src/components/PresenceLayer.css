@@ -1,0 +1,101 @@
+.presence-bar {
+  position: absolute;
+  z-index: 7;
+  top: var(--sp-3);
+  right: var(--sp-3);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  padding: 6px 12px 6px 10px;
+  background: var(--surface-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-pill);
+  box-shadow: var(--shadow-md);
+  font-size: var(--fs-sm);
+}
+
+.presence-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--text-faint);
+  flex-shrink: 0;
+}
+.presence-dot--online {
+  background: var(--success);
+  box-shadow: 0 0 0 3px var(--success-soft);
+}
+.presence-dot--connecting {
+  background: var(--warning);
+  box-shadow: 0 0 0 3px rgba(245, 181, 69, 0.18);
+  animation: presence-pulse 1.1s ease-in-out infinite;
+}
+.presence-dot--offline {
+  background: var(--text-faint);
+}
+@keyframes presence-pulse {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.presence-empty {
+  font-size: var(--fs-sm);
+  color: var(--text-3);
+}
+
+.presence-avatars {
+  display: flex;
+}
+
+.presence-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  margin-left: -7px;
+  border-radius: 50%;
+  border: 2px solid var(--surface-1);
+  color: #06120f;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+.presence-avatar:first-child {
+  margin-left: 0;
+}
+
+/* --- Remote cursors overlay --- */
+.cursor-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 7;
+}
+
+.remote-cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: flex-start;
+  gap: 2px;
+  will-change: transform;
+  transition: transform 60ms linear;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+.remote-cursor__label {
+  margin-top: 8px;
+  padding: 2px 7px;
+  border-radius: var(--r-sm);
+  color: #06120f;
+  font-size: 11px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  white-space: nowrap;
+}

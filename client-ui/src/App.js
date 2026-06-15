@@ -1,91 +1,65 @@
-import React, { useState, useRef, useCallback } from 'react';
-import ReactFlow, {
-  ReactFlowProvider,
-  addEdge,
-  useNodesState,
-  useEdgesState,
-  Controls,
-} from 'reactflow';
-import 'reactflow/dist/style.css';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
-import Sidebar from './components/Sidebar.js';
+import { AuthProvider, useAuth } from './auth/AuthContext';
+import { ToastProvider } from './components/Toast';
+import './App.css';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import BotList from './pages/BotList';
+import BotEditor from './pages/BotEditor';
 
-import './dnd.css';
+function ProtectedRoute({ children }) {
+  const { user, loading } = useAuth();
+  const location = useLocation();
 
-const initialNodes = [
-  {
-    id: '1',
-    type: 'input',
-    data: { label: 'input node' },
-    position: { x: 250, y: 5 },
-  },
-];
+  if (loading)
+    return (
+      <div className="app-boot">
+        <div className="spinner spinner--lg" />
+        <span>Loading your workspace…</span>
+      </div>
+    );
+  if (!user) return <Navigate to="/login" replace state={{ from: location }} />;
+  return children;
+}
 
-let id = 0;
-const getId = () => `dndnode_${id++}`;
-
-const DnDFlow = () => {
-  const reactFlowWrapper = useRef(null);
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
-  const [reactFlowInstance, setReactFlowInstance] = useState(null);
-
-  const onConnect = useCallback((params) => setEdges((eds) => addEdge(params, eds)), []);
-
-  const onDragOver = useCallback((event) => {
-    event.preventDefault();
-    event.dataTransfer.dropEffect = 'move';
-  }, []);
-
-  const onDrop = useCallback(
-    (event) => {
-      event.preventDefault();
-
-      const type = event.dataTransfer.getData('application/reactflow');
-
-      // check if the dropped element is valid
-      if (typeof type === 'undefined' || !type) {
-        return;
-      }
-
-      const position = reactFlowInstance.screenToFlowPosition({
-        x: event.clientX,
-        y: event.clientY,
-      });
-      const newNode = {
-        id: getId(),
-        type,
-        position,
-        data: { label: `${type} node` },
-      };
-
-      setNodes((nds) => nds.concat(newNode));
-    },
-    [reactFlowInstance],
-  );
-
+export default function App() {
   return (
-    <div className="dndflow">
-      <ReactFlowProvider>
-        <Sidebar />
-        <div className="reactflow-wrapper" ref={reactFlowWrapper}>
-          <ReactFlow
-            nodes={nodes}
-            edges={edges}
-            onNodesChange={onNodesChange}
-            onEdgesChange={onEdgesChange}
-            onConnect={onConnect}
-            onInit={setReactFlowInstance}
-            onDrop={onDrop}
-            onDragOver={onDragOver}
-            fitView
-          >
-            <Controls />
-          </ReactFlow>
-        </div>
-      </ReactFlowProvider>
-    </div>
+    <AuthProvider>
+      <ToastProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <BotList />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/bots/new"
+            element={
+              <ProtectedRoute>
+                <BotEditor />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/bots/:id"
+            element={
+              <ProtectedRoute>
+                <BotEditor />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+      </ToastProvider>
+    </AuthProvider>
   );
-};
-
-export default DnDFlow;
+}

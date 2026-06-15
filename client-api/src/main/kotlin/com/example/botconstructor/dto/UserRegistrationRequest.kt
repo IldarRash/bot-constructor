@@ -1,8 +1,8 @@
 package com.example.botconstructor.dto
 
 import com.example.botconstructor.model.User
-import javax.validation.constraints.Email
-import javax.validation.constraints.NotBlank
+import jakarta.validation.constraints.Email
+import jakarta.validation.constraints.NotBlank
 
 data class UserRegistrationRequest(
         @field:NotBlank

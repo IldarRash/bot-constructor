@@ -4,6 +4,7 @@ import com.example.botconstructor.dto.*
 import com.example.botconstructor.exceptions.InvalidRequestException
 import com.example.botconstructor.services.UserService
 import com.example.botconstructor.services.UserSessionProvider
+import com.example.botconstructor.validation.RequestValidator
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -20,7 +21,8 @@ import reactor.core.publisher.Mono
 @Service
 class UserHandler(
         private val userService: UserService,
-        private val userSessionProvider: UserSessionProvider
+        private val userSessionProvider: UserSessionProvider,
+        private val requestValidator: RequestValidator,
 ) {
 
     /**
@@ -34,7 +36,7 @@ class UserHandler(
         return serverRequest
                 .bodyToMono(UserRegistrationRequest::class.java)
                 .flatMap {
-                    userService.signup(it)
+                    userService.signup(requestValidator.validate(it))
                 }.flatMap {
                     ok().bodyValue(it)
                 }.onErrorResume(::handleInvalidRequestException)
@@ -80,9 +82,7 @@ class UserHandler(
     fun updateUser(serverRequest: ServerRequest): Mono<ServerResponse> {
         return userSessionProvider.getCurrentUserSessionOrFail()
                 .zipWith(serverRequest.bodyToMono(UpdateUserRequest::class.java))
-                .flatMap { (userSession, updateUserRequest) ->
-                    userService.updateUser(updateUserRequest, userSession)
-                }
+                .flatMap { userService.updateUser(requestValidator.validate(it.t2), it.t1) }
                 .flatMap {
                     ok().bodyValue(it)
                 }

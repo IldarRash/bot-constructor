@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bot-api
+  namespace: bot-constructor
+  labels:
+    app: bot-api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bot-api
+  template:
+    metadata:
+      labels:
+        app: bot-api
+    spec:
+      containers:
+        - name: bot-api
+          image: bot-constructor/bot-api:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8083
+          env:
+            - name: CLIENT_API_URI
+              value: http://client-api:9000
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8083
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8083
+            initialDelaySeconds: 40
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: bot-api
+  namespace: bot-constructor
+spec:
+  selector:
+    app: bot-api
+  ports:
+    - port: 8083
+      targetPort: 8083

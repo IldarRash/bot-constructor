@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component
 class PasswordService {
     private val encoder = BCryptPasswordEncoder()
 
-    fun encodePassword(rowPassword: String): String = encoder.encode(rowPassword)
+    fun encodePassword(rowPassword: String): String = encoder.encode(rowPassword)!!
 
     fun matches(rowPassword: String, encodedPassword: String): Boolean =
             encoder.matches(rowPassword, encodedPassword)

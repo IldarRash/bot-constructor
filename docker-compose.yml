@@ -1,28 +1,54 @@
-version: '3.8'
-
 services:
-  auth-server:
-    build: ./auth-server
+  mongo:
+    image: mongo:6
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
     ports:
-      - "8081:8081"
+      - "27017:27017"
 
   client-api:
-    build: ./client-api
+    build:
+      context: .
+      dockerfile: client-api/Dockerfile
     ports:
-      - "8082:8080"
+      - "9000:9000"
+    environment:
+      SPRING_MONGODB_URI: mongodb://root:example@mongo:27017/bot?authSource=admin
     depends_on:
-      - auth-server
+      - mongo
 
-  gateway:
-    build: ./gateway
+  bot-api:
+    build:
+      context: .
+      dockerfile: bot-api/Dockerfile
     ports:
-      - "8080:8080"
+      - "8083:8083"
+    environment:
+      CLIENT_API_URI: http://client-api:9000
     depends_on:
       - client-api
 
+  gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      CLIENT_API_URI: http://client-api:9000
+      # WebSocket routing filter needs a ws:// scheme to proxy the RSocket upgrade.
+      CLIENT_API_WS_URI: ws://client-api:9000
+      BOT_API_URI: http://bot-api:8083
+    depends_on:
+      - client-api
+      - bot-api
+
   client-ui:
-    build: ./client-ui
+    build:
+      context: ./client-ui
+      dockerfile: Dockerfile
     ports:
       - "3000:80"
     depends_on:
-      - gateway 
+      - gateway

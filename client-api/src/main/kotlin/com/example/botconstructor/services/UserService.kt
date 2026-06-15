@@ -35,7 +35,9 @@ class UserService(
     fun signup(request: UserRegistrationRequest): Mono<UserView> {
         return userRepository.existsByEmail(request.email)
                 .zipWith(userRepository.existsByUsername(request.username))
-                .flatMap { (emailExists, usernameExists) ->
+                .flatMap {
+                    val emailExists = it.t1
+                    val usernameExists = it.t2
                     if (emailExists) {
                         Mono.error(InvalidRequestException("Email", "already in use"))
                     } else if (usernameExists) {

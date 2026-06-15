@@ -1,0 +1,225 @@
+.editor-page {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: var(--bg-base);
+}
+
+/* --- Top bar --- */
+.editor-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 10px var(--sp-5);
+  background: linear-gradient(180deg, rgba(16, 20, 29, 0.96), rgba(10, 13, 20, 0.94));
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  z-index: 20;
+}
+
+.editor-header__left {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--sp-3);
+}
+
+.editor-back {
+  font-size: 18px;
+  padding: 8px 12px;
+  margin-bottom: 1px;
+}
+
+.editor-header .meta-fields {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.editor-header .field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.editor-header .name-input {
+  min-width: 220px;
+  padding: 8px 11px;
+}
+.editor-header .field-select {
+  padding: 8px 11px;
+}
+
+.editor-actions {
+  display: flex;
+  gap: var(--sp-2);
+  align-items: center;
+}
+
+/* --- Body layout --- */
+.editor-main {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.canvas-wrap {
+  flex: 1;
+  position: relative;
+  background: var(--bg-app);
+}
+
+.canvas-toolbar {
+  position: absolute;
+  z-index: 6;
+  top: var(--sp-3);
+  left: var(--sp-3);
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.canvas-hint {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  background: var(--surface-glass);
+  border: 1px solid var(--border);
+  padding: 5px 9px;
+  border-radius: var(--r-pill);
+  backdrop-filter: blur(8px);
+}
+
+/* --- Inspector (right) --- */
+.inspector {
+  width: 330px;
+  flex-shrink: 0;
+  background: var(--surface-1);
+  border-left: 1px solid var(--border);
+  padding: var(--sp-5);
+  overflow-y: auto;
+}
+
+.inspector__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.inspector__head h3 {
+  margin: 0;
+  font-size: var(--fs-md);
+}
+
+.inspector .hint {
+  margin: 0 0 var(--sp-5);
+  font-size: var(--fs-sm);
+  color: var(--text-3);
+  line-height: 1.5;
+}
+
+.inspector .field-label {
+  margin-top: var(--sp-2);
+}
+.inspector textarea.field-area,
+.inspector input.field-input {
+  margin-bottom: var(--sp-4);
+}
+
+.inspector__delete {
+  width: 100%;
+  margin-top: var(--sp-2);
+}
+
+.inspector__fallback {
+  min-height: 180px;
+}
+
+.editor-error {
+  background: var(--danger-soft);
+  border: 1px solid var(--danger-border);
+  border-left: 3px solid var(--danger);
+  color: var(--danger);
+  border-radius: var(--r-md);
+  padding: 8px 12px;
+  font-size: var(--fs-sm);
+}
+
+.editor-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-4);
+  height: 100%;
+  color: var(--text-3);
+  font-size: var(--fs-sm);
+}
+
+.full-width {
+  flex-basis: 100%;
+}
+
+/* ----------------------------------------------------------------------------
+   @xyflow/react v12 dark theming via CSS variables + element overrides.
+   colorMode="dark" sets sensible defaults; we tune to our palette.
+   ---------------------------------------------------------------------------- */
+.canvas-wrap .react-flow {
+  --xy-edge-stroke-default: #3a475c;
+  --xy-edge-stroke-selected-default: var(--accent);
+  --xy-connectionline-stroke-default: var(--accent);
+  --xy-attribution-background-color-default: transparent;
+}
+
+/* Edges */
+.canvas-wrap .react-flow__edge-path {
+  stroke-width: 1.6;
+}
+.canvas-wrap .react-flow__edge.selected .react-flow__edge-path,
+.canvas-wrap .react-flow__edge:hover .react-flow__edge-path {
+  stroke: var(--accent);
+}
+
+/* Controls — glassy dark pill cluster */
+.canvas-wrap .react-flow__controls {
+  border-radius: var(--r-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--border);
+}
+.canvas-wrap .react-flow__controls-button {
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  color: var(--text-2);
+  width: 30px;
+  height: 30px;
+}
+.canvas-wrap .react-flow__controls-button:hover {
+  background: var(--surface-3);
+  color: var(--accent);
+}
+.canvas-wrap .react-flow__controls-button svg {
+  fill: currentColor;
+}
+
+/* MiniMap frame */
+.canvas-wrap .react-flow__minimap {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+
+/* Selection box */
+.canvas-wrap .react-flow__selection {
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-ring);
+}
+
+@media (max-width: 720px) {
+  .inspector {
+    width: 280px;
+  }
+}

@@ -1,0 +1,358 @@
+/* ============================================================================
+   Bot Constructor — Design System
+   "Terminal-grade dev tool": deep blue-black canvas, a single vivid cyan
+   accent backed by a violet secondary, monospace for ids/keywords/code.
+   Every screen consumes these tokens. Change them here, change everything.
+   ============================================================================ */
+
+:root {
+  /* --- Surfaces (deep neutral, blue-tinted near-black) --- */
+  --bg-base: #07090f;        /* page void */
+  --bg-app: #0a0d14;         /* app shell */
+  --surface-1: #10141d;      /* primary panels */
+  --surface-2: #161b26;      /* elevated cards / inputs */
+  --surface-3: #1d2330;      /* hover / raised elements */
+  --surface-glass: rgba(22, 27, 38, 0.72);
+
+  /* --- Borders & lines --- */
+  --border: #222a38;
+  --border-strong: #2e394b;
+  --border-faint: #1a2029;
+
+  /* --- Text --- */
+  --text-1: #e8ecf4;         /* primary */
+  --text-2: #a6b0c3;         /* secondary */
+  --text-3: #6b7689;         /* muted / meta */
+  --text-faint: #475063;     /* placeholders, disabled */
+
+  /* --- Accent: cyan (primary) + violet (secondary) --- */
+  --accent: #2dd4bf;         /* signature cyan-teal */
+  --accent-bright: #5eead4;
+  --accent-dim: #14b8a6;
+  --accent-soft: rgba(45, 212, 191, 0.12);
+  --accent-ring: rgba(45, 212, 191, 0.35);
+  --accent-glow: rgba(45, 212, 191, 0.22);
+
+  --violet: #8b7dff;
+  --violet-soft: rgba(139, 125, 255, 0.14);
+
+  /* --- Semantic --- */
+  --danger: #ff5d6c;
+  --danger-soft: rgba(255, 93, 108, 0.12);
+  --danger-border: rgba(255, 93, 108, 0.32);
+  --success: #3ddc84;
+  --success-soft: rgba(61, 220, 132, 0.14);
+  --warning: #f5b545;
+
+  /* --- Typography --- */
+  --font-sans: 'Sora', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+
+  --fs-xs: 11px;
+  --fs-sm: 13px;
+  --fs-base: 14px;
+  --fs-md: 15px;
+  --fs-lg: 18px;
+  --fs-xl: 22px;
+  --fs-2xl: 30px;
+
+  /* --- Spacing scale --- */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 16px;
+  --sp-5: 20px;
+  --sp-6: 24px;
+  --sp-8: 32px;
+  --sp-10: 40px;
+
+  /* --- Radius --- */
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --r-xl: 20px;
+  --r-pill: 999px;
+
+  /* --- Shadow & glow --- */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 6px 20px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 18px 50px rgba(0, 0, 0, 0.55);
+  --glow-accent: 0 0 0 1px var(--accent-ring), 0 8px 30px var(--accent-glow);
+
+  /* --- Motion --- */
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur: 180ms;
+
+  color-scheme: dark;
+}
+
+/* ----------------------------------------------------------------------------
+   Base reset / global element styling
+   ---------------------------------------------------------------------------- */
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(1100px 700px at 12% -8%, rgba(45, 212, 191, 0.07), transparent 60%),
+    radial-gradient(900px 600px at 92% 4%, rgba(139, 125, 255, 0.06), transparent 55%),
+    var(--bg-base);
+  color: var(--text-1);
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code,
+kbd,
+.mono {
+  font-family: var(--font-mono);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--accent-bright);
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--accent-bright);
+}
+
+/* Scrollbars in the dark */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+}
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: var(--r-pill);
+  border: 3px solid transparent;
+  background-clip: padding-box;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: #3a475c;
+  background-clip: padding-box;
+}
+
+/* Universal focus ring — keyboard accessible everywhere */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--r-sm);
+}
+
+/* ----------------------------------------------------------------------------
+   Shared primitives (buttons, fields, badges) used across screens
+   ---------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-2);
+  padding: 9px 16px;
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  font-weight: 600;
+  line-height: 1;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease),
+    transform var(--dur) var(--ease), box-shadow var(--dur) var(--ease), color var(--dur) var(--ease);
+}
+.btn:active {
+  transform: translateY(1px);
+}
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary {
+  background: linear-gradient(180deg, var(--accent-bright), var(--accent-dim));
+  color: #04211d;
+  box-shadow: 0 6px 18px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+.btn-primary:hover:not(:disabled) {
+  box-shadow: 0 8px 26px var(--accent-glow), inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  filter: brightness(1.05);
+}
+
+.btn-secondary {
+  background: var(--surface-2);
+  color: var(--text-1);
+  border-color: var(--border-strong);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--surface-3);
+  border-color: #3a475c;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-2);
+  border-color: transparent;
+}
+.btn-ghost:hover:not(:disabled) {
+  background: var(--surface-2);
+  color: var(--text-1);
+}
+
+.btn-danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+  border-color: var(--danger-border);
+}
+.btn-danger:hover:not(:disabled) {
+  background: rgba(255, 93, 108, 0.18);
+  border-color: var(--danger);
+}
+
+/* Form fields */
+.field-input,
+.field-area,
+.field-select {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  color: var(--text-1);
+  font-family: var(--font-sans);
+  font-size: var(--fs-base);
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease),
+    background var(--dur) var(--ease);
+}
+.field-area {
+  resize: vertical;
+  line-height: 1.55;
+}
+.field-input::placeholder,
+.field-area::placeholder {
+  color: var(--text-faint);
+}
+.field-input:focus,
+.field-area:focus,
+.field-select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-ring);
+  background: var(--surface-1);
+}
+
+.field-label {
+  display: block;
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 6px;
+}
+
+/* Type badge — small monospace pill */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 3px 9px;
+  border-radius: var(--r-pill);
+  background: var(--accent-soft);
+  color: var(--accent-bright);
+  border: 1px solid var(--accent-ring);
+}
+.badge--violet {
+  background: var(--violet-soft);
+  color: var(--violet);
+  border-color: rgba(139, 125, 255, 0.32);
+}
+
+/* Spinner */
+.spinner {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid var(--border-strong);
+  border-top-color: var(--accent);
+  animation: spin 0.7s linear infinite;
+}
+.spinner--lg {
+  width: 32px;
+  height: 32px;
+  border-width: 3px;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* App brand mark used in headers */
+.brand-mark {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 700;
+  font-size: var(--fs-lg);
+  letter-spacing: -0.02em;
+  color: var(--text-1);
+}
+.brand-mark__glyph {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: linear-gradient(145deg, var(--accent), var(--violet));
+  color: #04211d;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 15px;
+  box-shadow: 0 4px 14px var(--accent-glow);
+}
+.brand-mark__name b {
+  color: var(--accent);
+  font-weight: 700;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

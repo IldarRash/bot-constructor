@@ -4,26 +4,26 @@ import com.example.botconstructor.security.UserTokenProvider
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jws
 import io.jsonwebtoken.Jwts
-import io.jsonwebtoken.SignatureAlgorithm
-import io.jsonwebtoken.security.Keys
 import org.springframework.stereotype.Component
+import java.security.interfaces.RSAPrivateKey
+import java.security.interfaces.RSAPublicKey
 import java.util.*
 
 @Component
 class JwtSigner : UserTokenProvider {
 
-    private val keyPair = Keys.keyPairFor(SignatureAlgorithm.RS256)
-    private val jwtParser = Jwts.parserBuilder()
-            .setSigningKey(keyPair.public)
+    private val keyPair = Jwts.SIG.RS256.keyPair().build()
+    private val jwtParser = Jwts.parser()
+            .verifyWith(keyPair.public as RSAPublicKey)
             .build()
 
-    fun validate(jwt: String): Jws<Claims> = jwtParser.parseClaimsJws(jwt)
+    fun validate(jwt: String): Jws<Claims> = jwtParser.parseSignedClaims(jwt)
 
     fun generateToken(userId: String): String = Jwts.builder()
-            .signWith(keyPair.private, SignatureAlgorithm.RS256)
-            .setSubject(userId)
-            .setExpiration(expirationDate())
-            .setIssuer("identity")
+            .signWith(keyPair.private as RSAPrivateKey)
+            .subject(userId)
+            .expiration(expirationDate())
+            .issuer("identity")
             .compact()
 
     private fun expirationDate(): Date {

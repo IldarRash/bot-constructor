@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: client-ui
+  namespace: bot-constructor
+  labels:
+    app: client-ui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: client-ui
+  template:
+    metadata:
+      labels:
+        app: client-ui
+    spec:
+      containers:
+        - name: client-ui
+          image: bot-constructor/client-ui:local
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 10
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: client-ui
+  namespace: bot-constructor
+spec:
+  selector:
+    app: client-ui
+  ports:
+    - port: 80
+      targetPort: 80

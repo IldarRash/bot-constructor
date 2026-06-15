@@ -37,7 +37,7 @@ class JwtConfig {
                 val token = authentication.credentials as String
                 val jws = signer.validate(token)
                 val authority = SimpleGrantedAuthority("ROLE_USER")
-                val userId = jws.body.subject
+                val userId = jws.payload.subject
                 val tokenPrincipal = TokenPrincipal(userId, token)
                 UsernamePasswordAuthenticationToken(tokenPrincipal, token, listOf(authority)).toMono()
             }
