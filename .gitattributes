@@ -1,0 +1,6 @@
+# Normalize line endings. The Gradle wrapper must be LF so it runs in Linux containers.
+* text=auto eol=lf
+*.bat text eol=crlf
+gradlew text eol=lf
+gradlew.bat text eol=crlf
+*.jar binary

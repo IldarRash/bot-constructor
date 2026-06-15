@@ -1,0 +1,9 @@
+.git
+.gitignore
+.idea
+**/.gradle
+**/build
+**/node_modules
+client-ui/dist
+client-ui/build
+**/*.iml

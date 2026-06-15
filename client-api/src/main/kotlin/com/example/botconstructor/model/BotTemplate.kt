@@ -1,25 +1,17 @@
 package com.example.botconstructor.model
 
-sealed class BotType {
+import org.springframework.data.annotation.Id
+import org.springframework.data.mongodb.core.mapping.Document
 
-    object Instagram : BotType()
-    object Vkontakte : BotType()
-}
+enum class BotType { Instagram, Vkontakte, Telegram }
 
-interface BotTemplate {
-    fun getBotType(): BotType
-}
-
-
-data class InstagramBot(val id: Long, val name: String, val ownerId: Long, val questions: BotQuestions, val answer: BotAnswer) : BotTemplate {
-    override fun getBotType(): BotType {
-        return BotType.Instagram
-    }
-}
-
-
-data class VkontakteBot(val id: Long, val name: String, val ownerId: Long, val questions: BotQuestions, val answer: BotAnswer) : BotTemplate {
-    override fun getBotType(): BotType {
-        return BotType.Vkontakte
-    }
-}
+@Document("bot_template")
+data class BotTemplate(
+        @Id
+        val id: String,
+        val name: String,
+        val type: BotType,
+        val ownerId: String,
+        val questions: List<Question>,
+        val fallbackAnswer: String,
+)

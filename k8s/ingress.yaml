@@ -1,0 +1,39 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bot-constructor
+  namespace: bot-constructor
+  # No rewrite-target: the gateway expects the original /api/** path, and the
+  # UI serves assets from /, so paths must be forwarded unchanged.
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: bot.local
+      http:
+        paths:
+          # /api goes straight to the gateway (which routes /api/** -> client-api
+          # and /api/runtime/** -> bot-api). The /api prefix already covers
+          # /api/runtime, so no extra ingress rule is needed for the runtime service.
+          # Note: the UI's own nginx also proxies /api/ -> gateway:8080, so the
+          # frontend works even without this ingress rule. This rule is here so
+          # API calls can also be made directly against the ingress host.
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: gateway
+                port:
+                  number: 8080
+          # Everything else is served by the UI (SPA + static assets). The /rsocket
+          # collaboration WebSocket is reached via the UI nginx, which proxies
+          # /rsocket -> gateway:8080 with the WS upgrade headers; the gateway then
+          # forwards the upgrade to client-api over ws://. No dedicated ingress rule
+          # is required because the ingress-nginx controller forwards the Upgrade/
+          # Connection headers for the matched backend automatically.
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: client-ui
+                port:
+                  number: 80

@@ -3,9 +3,35 @@ spring:
     name: gateway
   cloud:
     gateway:
-      rsocket:
-        routing:
-          route-id: client-api
-          service-name: client-api
+      server:
+        webflux:
+          routes:
+            # Order matters: more specific predicates must come first.
+            # Runtime calls go to bot-api; everything else under /api goes to client-api.
+            - id: client-api-runtime
+              uri: ${BOT_API_URI:http://localhost:8083}
+              predicates:
+                - Path=/api/runtime/**
+            - id: client-api
+              uri: ${CLIENT_API_URI:http://localhost:9000}
+              predicates:
+                - Path=/api/**
+            # RSocket collaboration WebSocket. The gateway's WebSocket routing filter
+            # only activates when the routed URI scheme is ws/wss, so this route must
+            # use a ws:// uri (NOT http://) to proxy the upgrade to client-api.
+            - id: client-api-rsocket
+              uri: ${CLIENT_API_WS_URI:ws://localhost:9000}
+              predicates:
+                - Path=/rsocket/**
+          globalcors:
+            cors-configurations:
+              '[/**]':
+                # The SPA is served same-origin behind this gateway (or nginx), and dev uses a Vite
+                # proxy — so the serving origin varies (it is not a fixed localhost:3000). Allow any
+                # origin pattern; safe because credentials are not used (token is sent in a header).
+                allowedOriginPatterns: "*"
+                allowedMethods: "*"
+                allowedHeaders: "*"
+                allowCredentials: false
 server:
-  port: 8080 
+  port: 8080

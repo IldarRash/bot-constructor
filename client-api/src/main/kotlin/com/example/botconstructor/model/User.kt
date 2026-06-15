@@ -8,8 +8,8 @@ data class User(
         val username: String,
         val email: String,
         var encodedPassword: String,
-        val bio: String?,
-        val image: String?,
+        val bio: String? = null,
+        val image: String? = null,
         @Id
         val id: String,
 ) {

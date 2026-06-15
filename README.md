@@ -1,95 +1,128 @@
 # Bot Constructor
 
-> A microservice platform for visually building and managing bots, with an RSocket API gateway fronting Spring Boot services and a React UI.
+> A microservice platform for visually building and managing chat bots — a Spring Cloud Gateway
+> fronting reactive Kotlin/Spring services, with a React + React Flow editor for designing bots.
 
-![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white)
-![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3-6DB33F?logo=springboot&logoColor=white)
+![Kotlin](https://img.shields.io/badge/Kotlin-2.3-7F52FF?logo=kotlin&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-4.0-6DB33F?logo=springboot&logoColor=white)
 ![Spring Cloud](https://img.shields.io/badge/Spring%20Cloud-Gateway-6DB33F?logo=spring&logoColor=white)
-![RSocket](https://img.shields.io/badge/RSocket-transport-1f6feb)
-![FlatBuffers](https://img.shields.io/badge/FlatBuffers-IDL-009688)
-![React](https://img.shields.io/badge/React-UI-61DAFB?logo=react&logoColor=black)
-![Gradle](https://img.shields.io/badge/Gradle-multi--module-02303A?logo=gradle&logoColor=white)
-![Java](https://img.shields.io/badge/Java-17-007396?logo=openjdk&logoColor=white)
+![Java](https://img.shields.io/badge/Java-25-007396?logo=openjdk&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)
+![Gradle](https://img.shields.io/badge/Gradle-9-02303A?logo=gradle&logoColor=white)
+![Kubernetes](https://img.shields.io/badge/Kubernetes-ready-326CE5?logo=kubernetes&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
 ## What & why
 
-Bot Constructor is a constructor for creating bots, split into independent backend services behind an API gateway. The gateway uses **RSocket** to route requests to the appropriate services, authentication is isolated in a dedicated `auth-server`, and bot/template data models are defined once as **FlatBuffers** schemas (`bots-model-idl`, `client-model-idl`) so producers and consumers share a single binary contract. A React frontend (`client-ui`) lets users create and manage bots. The split keeps auth, routing, and the client API independently buildable and deployable.
+Bot Constructor lets a user register, then visually design bots — each bot is a set of **questions**
+(with trigger keywords) and an **answer**, arranged on a drag-and-drop canvas. The system is split
+into independently deployable services behind an **API gateway**:
+
+- The **gateway** is the single entry point; it routes `/api/**` to the backend over HTTP.
+- The **client-api** owns users and bots: stateless **JWT auth**, **owner-scoped** bot CRUD, and
+  reactive persistence to **MongoDB**.
+- The **React** single-page app talks only to the gateway and renders the bot editor with
+  **React Flow**.
+
+The whole stack is fully reactive (Spring WebFlux, Reactor, reactive MongoDB) and runs locally with
+one script or on **Kubernetes** (verified on minikube).
 
 ## Architecture
 
 ```text
-        ┌────────────┐        ┌──────────────┐
-        │ client-ui  │  HTTP  │   gateway    │   API gateway
-        │  (React)   │ ─────▶ │  (RSocket    │   routes requests to services
-        └────────────┘        │   routing)   │
-                              └──────┬───────┘
-                       ┌─────────────┼──────────────┐
-                       ▼             ▼              ▼
-              ┌──────────────┐ ┌────────────┐ ┌────────────┐
-              │ auth-server  │ │ client-api │ │  bot-api   │
-              │  (authn)     │ │ users/bots │ │ (planned)  │
-              └──────────────┘ └────────────┘ └────────────┘
-
-  Shared binary contracts (FlatBuffers IDL):
-    bots-model-idl    — schema for bot events
-    client-model-idl  — schema for bot templates
+   ┌────────────┐   HTTP    ┌──────────────┐   HTTP /api/**   ┌────────────────┐
+   │ client-ui  │ ───────▶  │   gateway     │ ───────────────▶ │   client-api    │
+   │ React+Vite │  :8080/   │ Spring Cloud  │                  │ WebFlux + JWT   │
+   │  :3000     │   proxy   │   Gateway     │                  │ users + bots    │
+   └────────────┘           └──────────────┘                  └───────┬────────┘
+                                                                       │ reactive
+                                                                       ▼
+                                                                ┌────────────┐
+                                                                │  MongoDB   │
+                                                                └────────────┘
+   auth-server (:8081) — standalone RSocket auth service (experimental, not on the request path)
 ```
 
-- **gateway** — API gateway; uses RSocket to route requests to the backend services.
-- **auth-server** — handles user authentication.
-- **client-api** — the main API for managing users and bots.
-- **bot-api** — bot-specific logic (to be implemented).
-- **client-ui** — React-based UI for creating and managing bots.
-- **bots-model-idl / client-model-idl** — FlatBuffers schemas shared across services.
+| Module        | Stack                                   | Responsibility                              |
+|---------------|-----------------------------------------|---------------------------------------------|
+| `gateway`     | Spring Cloud Gateway (WebFlux)          | Single entry point; routes `/api/**`        |
+| `client-api`  | Spring WebFlux, Security, reactive Mongo| Users, JWT auth, owner-scoped bot CRUD      |
+| `auth-server` | Spring Security RSocket                 | Experimental standalone auth (not wired in) |
+| `client-ui`   | React 19, Vite, React Flow              | Auth screens + visual bot editor            |
 
-Built on Spring Boot 3.3 with Spring Cloud, Kotlin 2.0 (JVM target 17), and Prometheus RSocket metrics.
+## Tech stack
 
-## Getting started
+- **Backend** — Kotlin 2.3, Spring Boot 4.0, Spring Cloud 2025.1.0, Spring WebFlux, Spring Security
+  (JWT via JJWT), reactive MongoDB, Java 25, Gradle 9.
+- **Frontend** — React 19, Vite 7, React Flow 12 (`@xyflow/react`), React Router 7.
+- **Infra** — Docker (multi-stage), Kubernetes manifests, GitHub Actions CI.
 
-### Prerequisites
+## Features
 
-- Java 17+
-- Node.js 14+ and npm 6+ (for `client-ui`)
-- Docker / Docker Compose (optional, to run the full stack)
+- 🔐 Register / log in with stateless JWT auth.
+- 🤖 Create, list, edit and delete bots — every operation scoped to the owner (no cross-user access).
+- 🎛️ Visual editor: drag question nodes onto a React Flow canvas, set keywords + the bot's answer,
+  choose a platform type (Telegram / Instagram / VK).
+- 🚪 Everything routed through the gateway; the SPA never talks to services directly.
 
-### Build the backend
+## Quick start (local)
+
+Prerequisites: **JDK 25**, **Node 20+**, **Docker** (for MongoDB).
 
 ```bash
-./gradlew build
+./run-local.sh
 ```
 
-### Run the frontend
+This starts MongoDB (Docker), builds and runs `client-api` + `gateway`, and launches the Vite dev
+server. Then open **http://localhost:3002** and register → create a bot → design it on the canvas.
+
+> The gateway runs on `:8090` locally (port 8080 may be taken on dev machines); the UI's Vite proxy
+> targets it automatically.
+
+### Run on Kubernetes (minikube)
 
 ```bash
-cd client-ui
-npm install
-npm start
+minikube start
+minikube addons enable ingress
+# build images straight into the cluster
+for s in client-api gateway client-ui; do
+  minikube image build -t bot-constructor/$s:local -f $s/Dockerfile .
+done
+kubectl apply -f k8s/
+kubectl -n bot-constructor get pods
 ```
 
-### Run everything with Docker Compose
+See [`k8s/README.md`](k8s/README.md) for the full deploy + access steps.
+
+## API
+
+All endpoints are under `/api` and (except signup/login) require `Authorization: Token <jwt>`.
+
+| Method | Path                 | Description                    |
+|--------|----------------------|--------------------------------|
+| POST   | `/api/users`         | Register (returns a JWT)       |
+| POST   | `/api/users/login`   | Log in (returns a JWT)         |
+| GET    | `/api/user`          | Current user                   |
+| POST   | `/api/bots`          | Create a bot                   |
+| GET    | `/api/bots`          | List the current user's bots   |
+| GET    | `/api/bots/{id}`     | Get one owned bot              |
+| PUT    | `/api/bots/{id}`     | Update an owned bot            |
+| DELETE | `/api/bots/{id}`     | Delete an owned bot            |
+
+## Build & test
 
 ```bash
-docker compose up --build
+./gradlew build                 # compile + test all backend modules (JDK 25 toolchain)
+./gradlew :client-api:test      # run client-api tests (MockK + StepVerifier + WebTestClient)
+cd client-ui && npm install && npm run build   # build the SPA
 ```
 
-| Service     | Port |
-|-------------|------|
-| gateway     | 8080 |
-| auth-server | 8081 |
-| client-api  | 8082 |
-| client-ui   | 3000 |
+## Screenshots
 
-Individual backend services can also be run from your IDE or via their generated JARs.
+> _Add screenshots/GIFs of the login screen and the React Flow bot editor here_
+> (`docs/login.png`, `docs/editor.gif`). Capture them from http://localhost:3002 after `run-local.sh`.
 
-## Project structure
+## License
 
-```text
-gateway/           Spring Cloud API gateway (RSocket routing)
-auth-server/       user authentication service
-client-api/        main client API (users + bots)
-bot-api/           bot-specific logic (to be implemented)
-bots-model-idl/    FlatBuffers schema for bot events
-client-model-idl/  FlatBuffers schema for bot templates
-client-ui/         React frontend
-docker-compose.yml full-stack local run
-```
+[MIT](LICENSE)

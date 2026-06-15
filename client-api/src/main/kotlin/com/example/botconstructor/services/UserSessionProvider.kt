@@ -15,14 +15,14 @@ class UserSessionProvider(private val userRepository: UserRepository) {
             getCurrentUserSessionOrNull()
                     .switchIfEmpty(Mono.error(InvalidRequestException("User", "current user is not login in")))
 
-    fun getCurrentUserSessionOrNull(): Mono<UserSession?> {
+    fun getCurrentUserSessionOrNull(): Mono<UserSession> {
         return ReactiveSecurityContextHolder.getContext()
                 .flatMap {
-                    if (it.authentication == null)
-                        return@flatMap Mono.empty<UserSession>()
-                    val token = it.authentication.principal as TokenPrincipal
+                    val authentication = it.authentication
+                            ?: return@flatMap Mono.empty<UserSession>()
+                    val token = authentication.principal as TokenPrincipal
                     return@flatMap userRepository.findById(token.userId)
-                            .map { UserSession(it, token.token) }
+                            .map { user -> UserSession(user, token.token) }
                 }
     }
 }

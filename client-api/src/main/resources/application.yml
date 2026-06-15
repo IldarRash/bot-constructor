@@ -5,11 +5,8 @@ logging:
     root: info
 
 spring:
-  data:
-    mongodb:
-      database: bot
-      username: root
-      password: example
+  mongodb:
+    uri: ${SPRING_MONGODB_URI:mongodb://root:example@localhost:27017/bot?authSource=admin}
   rsocket:
     server:
       mapping-path: /rsocket

@@ -1,7 +1,7 @@
 package com.example.botconstructor.dto
 
 import com.realworld.springmongo.validation.NotBlankOrNull
-import javax.validation.constraints.Email
+import jakarta.validation.constraints.Email
 
 /**
  * Data transfer object for updating a user.

@@ -35,3 +35,11 @@ out/
 
 ### VS Code ###
 .vscode/
+
+### Node / Vite (client-ui) ###
+node_modules/
+client-ui/dist/
+
+### Local run artifacts & logs ###
+# Hidden scratch logs written by local run/verify scripts (out/err/port-forward/build/etc.)
+.*.log
