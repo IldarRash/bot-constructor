@@ -13,6 +13,10 @@ dependencies {
     implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
 
+    // Sandboxed GraalVM JS for inline expressions and the Code node (community runtime, JDK 25).
+    implementation("org.graalvm.polyglot:polyglot:25.0.3")
+    implementation("org.graalvm.polyglot:js-community:25.0.3")
+
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("io.projectreactor:reactor-test")
     testImplementation("io.mockk:mockk:1.14.2")

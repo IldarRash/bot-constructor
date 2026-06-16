@@ -19,6 +19,11 @@ import SendMessageNode from '../components/nodes/SendMessageNode';
 import ConditionNode from '../components/nodes/ConditionNode';
 import SetVariableNode from '../components/nodes/SetVariableNode';
 import HttpRequestNode from '../components/nodes/HttpRequestNode';
+import TelegramNode from '../components/nodes/TelegramNode';
+import ClaudeAnthropicNode from '../components/nodes/ClaudeAnthropicNode';
+import SlackNode from '../components/nodes/SlackNode';
+import DiscordNode from '../components/nodes/DiscordNode';
+import CodeNode from '../components/nodes/CodeNode';
 import PresenceLayer from '../components/PresenceLayer';
 import TestBotPanel from '../components/TestBotPanel';
 import { getBot, createBot, updateBot } from '../api/bots';
@@ -40,6 +45,11 @@ const nodeTypes = {
   condition: ConditionNode,
   setVariable: SetVariableNode,
   httpRequest: HttpRequestNode,
+  telegramSend: TelegramNode,
+  anthropicMessage: ClaudeAnthropicNode,
+  slackSend: SlackNode,
+  discordSend: DiscordNode,
+  code: CodeNode,
 };
 
 // Headers editor (de)serialization: the inspector textarea holds one `Key: Value` per line;
@@ -200,6 +210,24 @@ function EditorInner() {
   const addSetVariable = () => addNode('setVariable', { name: '', value: '' });
   const addHttpRequest = () =>
     addNode('httpRequest', { method: 'GET', url: '', headers: {}, body: '', saveAs: 'http' });
+  const addTelegram = () =>
+    addNode('telegramSend', { botToken: '', chatId: '', text: '{{message}}', saveAs: 'telegram' });
+  const addAnthropic = () =>
+    addNode('anthropicMessage', {
+      apiKey: '',
+      model: 'claude-opus-4-8',
+      maxTokens: '1024',
+      prompt: '{{message}}',
+      saveAs: 'ai',
+    });
+  const addSlack = () =>
+    addNode('slackSend', { webhookUrl: '', text: '{{message}}', saveAs: 'slack' });
+  const addDiscord = () =>
+    addNode('discordSend', { webhookUrl: '', content: '{{message}}', saveAs: 'discord' });
+  const addCode = () =>
+    addNode('code', {
+      code: '// $items is the array of input items, $vars the variables.\nreturn $items;',
+    });
 
   function updateSelectedLabel(value) {
     if (selectedId) patchNodeData(selectedId, { label: value });
@@ -363,6 +391,21 @@ function EditorInner() {
             </button>
             <button className="btn btn-secondary" onClick={addHttpRequest}>
               <span aria-hidden="true">+</span> HTTP request
+            </button>
+            <button className="btn btn-secondary" onClick={addTelegram}>
+              <span aria-hidden="true">+</span> Telegram
+            </button>
+            <button className="btn btn-secondary" onClick={addAnthropic}>
+              <span aria-hidden="true">+</span> Claude (Anthropic)
+            </button>
+            <button className="btn btn-secondary" onClick={addSlack}>
+              <span aria-hidden="true">+</span> Slack
+            </button>
+            <button className="btn btn-secondary" onClick={addDiscord}>
+              <span aria-hidden="true">+</span> Discord
+            </button>
+            <button className="btn btn-secondary" onClick={addCode}>
+              <span aria-hidden="true">+</span> Code (JS)
             </button>
             <span className="canvas-hint mono">{nodes.length} nodes</span>
           </div>
@@ -624,6 +667,288 @@ function EditorInner() {
               value={selectedNode.data.body || ''}
               onChange={(e) => patchNodeData(selectedId, { body: e.target.value })}
               placeholder={'{"name": "{{user.name}}"}'}
+            />
+
+            <button className="btn btn-danger inspector__delete" onClick={deleteSelected}>
+              Delete node
+            </button>
+          </aside>
+        )}
+
+        {selectedNode && selectedNode.type === 'telegramSend' && (
+          <aside className="inspector">
+            <div className="inspector__head">
+              <h3>Telegram</h3>
+              <span className="badge mono">telegramSend</span>
+            </div>
+            <p className="hint">
+              Sends a message via the Telegram Bot API and stores the response in{' '}
+              <code>vars[saveAs]</code> (read <code>{'{{saveAs.ok}}'}</code> /{' '}
+              <code>{'{{saveAs.messageId}}'}</code>). The chat id and text support{' '}
+              <code>{'{{variable}}'}</code> expressions. Wire the <code>success</code> and{' '}
+              <code>error</code> outputs.
+            </p>
+
+            <label className="field-label" htmlFor="tg-token">
+              Bot token
+            </label>
+            <input
+              id="tg-token"
+              className="field-input"
+              type="password"
+              value={selectedNode.data.botToken || ''}
+              onChange={(e) => patchNodeData(selectedId, { botToken: e.target.value })}
+              placeholder="123456:ABC-DEF..."
+            />
+
+            <label className="field-label" htmlFor="tg-chat">
+              Chat ID
+            </label>
+            <input
+              id="tg-chat"
+              className="field-input"
+              value={selectedNode.data.chatId || ''}
+              onChange={(e) => patchNodeData(selectedId, { chatId: e.target.value })}
+              placeholder="123456789 or @channel"
+            />
+
+            <label className="field-label" htmlFor="tg-text">
+              Message text
+            </label>
+            <textarea
+              id="tg-text"
+              className="field-area"
+              rows={4}
+              value={selectedNode.data.text || ''}
+              onChange={(e) => patchNodeData(selectedId, { text: e.target.value })}
+              placeholder="Hello {{message}}"
+            />
+
+            <label className="field-label" htmlFor="tg-saveas">
+              Save response as
+            </label>
+            <input
+              id="tg-saveas"
+              className="field-input"
+              value={selectedNode.data.saveAs || ''}
+              onChange={(e) => patchNodeData(selectedId, { saveAs: e.target.value })}
+              placeholder="telegram"
+            />
+
+            <button className="btn btn-danger inspector__delete" onClick={deleteSelected}>
+              Delete node
+            </button>
+          </aside>
+        )}
+
+        {selectedNode && selectedNode.type === 'anthropicMessage' && (
+          <aside className="inspector">
+            <div className="inspector__head">
+              <h3>Claude (Anthropic)</h3>
+              <span className="badge mono">anthropicMessage</span>
+            </div>
+            <p className="hint">
+              Calls the Anthropic Messages API and stores <code>{'{ text, raw }'}</code> in{' '}
+              <code>vars[saveAs]</code> (read the reply as <code>{'{{saveAs.text}}'}</code>). The
+              prompt supports <code>{'{{variable}}'}</code> expressions. Wire the <code>success</code>{' '}
+              and <code>error</code> outputs.
+            </p>
+
+            <label className="field-label" htmlFor="an-key">
+              API key
+            </label>
+            <input
+              id="an-key"
+              className="field-input"
+              type="password"
+              value={selectedNode.data.apiKey || ''}
+              onChange={(e) => patchNodeData(selectedId, { apiKey: e.target.value })}
+              placeholder="sk-ant-..."
+            />
+
+            <label className="field-label" htmlFor="an-model">
+              Model
+            </label>
+            <select
+              id="an-model"
+              className="field-select"
+              value={selectedNode.data.model || 'claude-opus-4-8'}
+              onChange={(e) => patchNodeData(selectedId, { model: e.target.value })}
+            >
+              <option value="claude-opus-4-8">claude-opus-4-8</option>
+              <option value="claude-sonnet-4-6">claude-sonnet-4-6</option>
+              <option value="claude-haiku-4-5-20251001">claude-haiku-4-5-20251001</option>
+            </select>
+
+            <label className="field-label" htmlFor="an-maxtokens">
+              Max tokens
+            </label>
+            <input
+              id="an-maxtokens"
+              className="field-input"
+              value={selectedNode.data.maxTokens || ''}
+              onChange={(e) => patchNodeData(selectedId, { maxTokens: e.target.value })}
+              placeholder="1024"
+            />
+
+            <label className="field-label" htmlFor="an-prompt">
+              Prompt
+            </label>
+            <textarea
+              id="an-prompt"
+              className="field-area"
+              rows={4}
+              value={selectedNode.data.prompt || ''}
+              onChange={(e) => patchNodeData(selectedId, { prompt: e.target.value })}
+              placeholder="{{message}}"
+            />
+
+            <label className="field-label" htmlFor="an-saveas">
+              Save as
+            </label>
+            <input
+              id="an-saveas"
+              className="field-input"
+              value={selectedNode.data.saveAs || ''}
+              onChange={(e) => patchNodeData(selectedId, { saveAs: e.target.value })}
+              placeholder="ai"
+            />
+
+            <button className="btn btn-danger inspector__delete" onClick={deleteSelected}>
+              Delete node
+            </button>
+          </aside>
+        )}
+
+        {selectedNode && selectedNode.type === 'slackSend' && (
+          <aside className="inspector">
+            <div className="inspector__head">
+              <h3>Slack</h3>
+              <span className="badge mono">slackSend</span>
+            </div>
+            <p className="hint">
+              Posts a message to a Slack Incoming Webhook and stores <code>{'{ ok: true }'}</code> in{' '}
+              <code>vars[saveAs]</code> on success. The text supports <code>{'{{variable}}'}</code>{' '}
+              expressions. Wire the <code>success</code> and <code>error</code> outputs.
+            </p>
+
+            <label className="field-label" htmlFor="sl-url">
+              Webhook URL
+            </label>
+            <input
+              id="sl-url"
+              className="field-input"
+              type="password"
+              value={selectedNode.data.webhookUrl || ''}
+              onChange={(e) => patchNodeData(selectedId, { webhookUrl: e.target.value })}
+              placeholder="https://hooks.slack.com/services/T.../B.../xxxx"
+            />
+
+            <label className="field-label" htmlFor="sl-text">
+              Message text
+            </label>
+            <textarea
+              id="sl-text"
+              className="field-area"
+              rows={4}
+              value={selectedNode.data.text || ''}
+              onChange={(e) => patchNodeData(selectedId, { text: e.target.value })}
+              placeholder="{{message}}"
+            />
+
+            <label className="field-label" htmlFor="sl-saveas">
+              Save result as
+            </label>
+            <input
+              id="sl-saveas"
+              className="field-input"
+              value={selectedNode.data.saveAs || ''}
+              onChange={(e) => patchNodeData(selectedId, { saveAs: e.target.value })}
+              placeholder="slack"
+            />
+
+            <button className="btn btn-danger inspector__delete" onClick={deleteSelected}>
+              Delete node
+            </button>
+          </aside>
+        )}
+
+        {selectedNode && selectedNode.type === 'discordSend' && (
+          <aside className="inspector">
+            <div className="inspector__head">
+              <h3>Discord</h3>
+              <span className="badge mono">discordSend</span>
+            </div>
+            <p className="hint">
+              Posts content to a Discord webhook and stores <code>{'{ ok: true }'}</code> in{' '}
+              <code>vars[saveAs]</code> on success. The content supports{' '}
+              <code>{'{{variable}}'}</code> expressions. Wire the <code>success</code> and{' '}
+              <code>error</code> outputs.
+            </p>
+
+            <label className="field-label" htmlFor="dc-url">
+              Webhook URL
+            </label>
+            <input
+              id="dc-url"
+              className="field-input"
+              type="password"
+              value={selectedNode.data.webhookUrl || ''}
+              onChange={(e) => patchNodeData(selectedId, { webhookUrl: e.target.value })}
+              placeholder="https://discord.com/api/webhooks/..."
+            />
+
+            <label className="field-label" htmlFor="dc-content">
+              Content
+            </label>
+            <textarea
+              id="dc-content"
+              className="field-area"
+              rows={4}
+              value={selectedNode.data.content || ''}
+              onChange={(e) => patchNodeData(selectedId, { content: e.target.value })}
+              placeholder="{{message}}"
+            />
+
+            <label className="field-label" htmlFor="dc-saveas">
+              Save as
+            </label>
+            <input
+              id="dc-saveas"
+              className="field-input"
+              value={selectedNode.data.saveAs || ''}
+              onChange={(e) => patchNodeData(selectedId, { saveAs: e.target.value })}
+              placeholder="discord"
+            />
+
+            <button className="btn btn-danger inspector__delete" onClick={deleteSelected}>
+              Delete node
+            </button>
+          </aside>
+        )}
+
+        {selectedNode && selectedNode.type === 'code' && (
+          <aside className="inspector">
+            <div className="inspector__head">
+              <h3>Code (JS)</h3>
+              <span className="badge mono">code</span>
+            </div>
+            <p className="hint">
+              Runs JavaScript over the input items. <code>$items</code> is the array of input items
+              and <code>$vars</code> the variables; <code>return</code> the items to emit. A guest
+              error routes the <code>error</code> output.
+            </p>
+
+            <label className="field-label" htmlFor="code-js">
+              JavaScript
+            </label>
+            <textarea
+              id="code-js"
+              className="field-area"
+              rows={8}
+              value={selectedNode.data.code || ''}
+              onChange={(e) => patchNodeData(selectedId, { code: e.target.value })}
+              placeholder={'return $items.map(i => ({...i, upper: (i.message||"").toUpperCase()}))'}
             />
 
             <button className="btn btn-danger inspector__delete" onClick={deleteSelected}>

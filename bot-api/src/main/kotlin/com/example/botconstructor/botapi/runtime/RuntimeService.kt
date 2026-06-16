@@ -10,6 +10,7 @@ import com.example.botconstructor.botapi.model.dto.StartSessionResponse
 import com.example.botconstructor.botapi.model.dto.WebhookRequest
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
 import java.time.Duration
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
@@ -78,17 +79,24 @@ class RuntimeService(
             text: String,
             initialVars: Map<String, Any?> = emptyMap(),
     ): Mono<MessageResponse> {
-        return WorkflowEngine.run(text, bot.nodes, bot.edges, bot.fallbackAnswer, httpCaller, initialVars)
-                .map { result ->
-                    MessageResponse(
-                            reply = result.reply,
-                            matched = result.matched?.let { MatchedQuestion(it.label) },
-                            // The engine already records steps as the wire DTO (it imports the dto
-                            // package as it does for FlowNode/FlowEdge), so no mapping is needed.
-                            trace = result.trace,
-                            vars = result.vars,
-                    )
-                }
+        // The engine's synchronous drain (pure nodes, incl. sandboxed `{{= }}` JS and the per-item
+        // executors) runs eagerly when `run(...)` is invoked, so it must not execute on the Netty
+        // event loop. `defer` makes that invocation happen at subscription time, and `subscribeOn`
+        // moves subscription onto a bounded-elastic worker — guest code never touches an nio thread.
+        return Mono.defer {
+            WorkflowEngine.run(text, bot.nodes, bot.edges, bot.fallbackAnswer, httpCaller, initialVars)
+                    .map { result ->
+                        MessageResponse(
+                                reply = result.reply,
+                                matched = result.matched?.let { MatchedQuestion(it.label) },
+                                // The engine already records steps as the wire DTO (it imports the dto
+                                // package as it does for FlowNode/FlowEdge), so no mapping is needed.
+                                trace = result.trace,
+                                vars = result.vars,
+                        )
+                    }
+        }
+                .subscribeOn(Schedulers.boundedElastic())
                 // Overall walk budget: a slow/hung HTTP node (or a pathological graph) must not pin a
                 // request. On timeout return the bot's safe fallback reply, not a 5xx.
                 .timeout(WALK_TIMEOUT)
