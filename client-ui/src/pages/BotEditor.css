@@ -137,6 +137,53 @@
   min-height: 180px;
 }
 
+/* --- Schedule section (inspector, no node selected) --- */
+.schedule {
+  margin-top: var(--sp-5);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--border);
+}
+.schedule__head {
+  margin-bottom: 6px;
+}
+.schedule__note {
+  margin-top: calc(-1 * var(--sp-2));
+  font-size: var(--fs-xs);
+  color: var(--text-2);
+}
+
+/* --- Webhook section (inspector, no node selected) --- */
+.webhook {
+  margin-top: var(--sp-5);
+  padding-top: var(--sp-4);
+  border-top: 1px solid var(--border);
+}
+.webhook__head {
+  margin-bottom: 6px;
+}
+.webhook__url {
+  display: flex;
+  align-items: stretch;
+  gap: var(--sp-2);
+}
+.webhook__url-text {
+  flex: 1;
+  min-width: 0;
+  display: block;
+  padding: 8px 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  color: var(--text-2);
+  font-size: var(--fs-xs);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.webhook__copy {
+  flex-shrink: 0;
+}
+
 .editor-error {
   background: var(--danger-soft);
   border: 1px solid var(--danger-border);

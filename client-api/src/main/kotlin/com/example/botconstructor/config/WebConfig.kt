@@ -33,6 +33,11 @@ class WebConfig : WebFluxConfigurer {
                 GET("/bots/{id}", botHandler::getBot)
                 PUT("/bots/{id}", botHandler::updateBot)
                 DELETE("/bots/{id}", botHandler::deleteBot)
+
+                // Internal, unauthenticated server-to-server lookup for bot-api: resolve a bot by
+                // its high-entropy webhook token. The token is the secret (no ownership check);
+                // permitAll for this path is configured in SecurityConfig.
+                GET("/internal/bots/by-webhook/{token}", botHandler::getBotByWebhookToken)
             }
         }
     }

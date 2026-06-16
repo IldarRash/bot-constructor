@@ -24,6 +24,8 @@ class RuntimeWebConfig : WebFluxConfigurer {
             accept(MediaType.APPLICATION_JSON).nest {
                 POST("/bots/{id}/sessions", runtimeHandler::startSession)
                 POST("/sessions/{sessionId}/messages", runtimeHandler::handleMessage)
+                // Public, token-guarded stateless flow invocation (no user JWT).
+                POST("/webhooks/{token}", runtimeHandler::runWebhook)
             }
         }
     }

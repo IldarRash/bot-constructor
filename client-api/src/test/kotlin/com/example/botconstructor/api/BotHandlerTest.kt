@@ -3,7 +3,10 @@ package com.example.botconstructor.api
 import com.example.botconstructor.config.WebConfig
 import com.example.botconstructor.dto.BotRequest
 import com.example.botconstructor.dto.BotView
-import com.example.botconstructor.dto.QuestionView
+import com.example.botconstructor.dto.EdgeView
+import com.example.botconstructor.dto.NodeRequest
+import com.example.botconstructor.dto.NodeView
+import com.example.botconstructor.dto.PositionView
 import com.example.botconstructor.exceptions.InvalidRequestException
 import com.example.botconstructor.model.BotType
 import com.example.botconstructor.model.User
@@ -48,7 +51,8 @@ class BotHandlerTest {
     private fun sampleRequest() = BotRequest(
             name = "Support",
             type = BotType.Telegram,
-            questions = emptyList(),
+            nodes = listOf(NodeRequest(id = "n1", type = "trigger")),
+            edges = emptyList(),
             fallbackAnswer = "Sorry, I did not understand",
     )
 
@@ -57,8 +61,10 @@ class BotHandlerTest {
             name = "Support",
             type = "Telegram",
             ownerId = ownerId,
-            questions = listOf(QuestionView("Hi?", listOf("hi"), "Hello there")),
+            nodes = listOf(NodeView("n1", "trigger", PositionView(0.0, 0.0), emptyMap())),
+            edges = emptyList<EdgeView>(),
             fallbackAnswer = "Sorry, I did not understand",
+            webhookToken = "tok-$id",
     )
 
     @Test
@@ -86,6 +92,27 @@ class BotHandlerTest {
                 .expectBody()
                 .jsonPath("$.length()").isEqualTo(2)
                 .jsonPath("$[0].id").isEqualTo("a")
+    }
+
+    @Test
+    fun `internal webhook lookup returns the bot without a user session`() {
+        every { botService.findByWebhookToken("secret-token") } returns Mono.just(sampleView("bot-1"))
+
+        client.get().uri("/api/internal/bots/by-webhook/secret-token")
+                .exchange()
+                .expectStatus().isOk
+                .expectBody()
+                .jsonPath("$.id").isEqualTo("bot-1")
+                .jsonPath("$.webhookToken").isEqualTo("tok-bot-1")
+    }
+
+    @Test
+    fun `internal webhook lookup returns 404 for an unknown token`() {
+        every { botService.findByWebhookToken("nope") } returns Mono.empty()
+
+        client.get().uri("/api/internal/bots/by-webhook/nope")
+                .exchange()
+                .expectStatus().isNotFound
     }
 
     @Test

@@ -11,6 +11,15 @@ export function getToken() {
   return token;
 }
 
+// Absolute gateway base URL for building user-facing links (e.g. webhook URLs).
+// BASE_URL is normally relative ('') so /api requests go through the dev proxy / same origin;
+// in that case we resolve against the current page origin so we can show a copyable absolute URL.
+export function getApiBaseUrl() {
+  if (BASE_URL) return BASE_URL.replace(/\/+$/, '');
+  if (typeof window !== 'undefined' && window.location) return window.location.origin;
+  return '';
+}
+
 export function setToken(t) {
   token = t || null;
   if (typeof localStorage === 'undefined') return;

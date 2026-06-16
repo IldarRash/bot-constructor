@@ -3,11 +3,75 @@ import { startSession, sendMessage } from '../api/runtime';
 import { ApiError } from '../api/client';
 import './TestBotPanel.css';
 
+// Render a single trace step's handle as a small chip, tinted by its semantic.
+const HANDLE_TONE = { true: 'ok', match: 'ok', false: 'mute', error: 'err' };
+
+function formatVar(value) {
+  if (value == null) return String(value);
+  if (typeof value === 'object') return JSON.stringify(value);
+  return String(value);
+}
+
+// n8n-style execution view: a collapsed disclosure under a bot reply that, when expanded,
+// lists the executed nodes (type + handle chip + detail) and the final variable state.
+function MessageTrace({ trace, vars }) {
+  const [open, setOpen] = useState(false);
+  const steps = Array.isArray(trace) ? trace : [];
+  if (steps.length === 0) return null; // robust to older/empty responses
+
+  const varEntries = vars && typeof vars === 'object' ? Object.entries(vars) : [];
+
+  return (
+    <div className="chat-trace">
+      <button
+        type="button"
+        className={`chat-trace__toggle${open ? ' is-open' : ''}`}
+        aria-expanded={open}
+        onClick={() => setOpen((v) => !v)}
+      >
+        <span className="chat-trace__caret" aria-hidden="true">▸</span>
+        trace ({steps.length} {steps.length === 1 ? 'step' : 'steps'})
+      </button>
+
+      {open && (
+        <div className="chat-trace__body">
+          <ol className="chat-trace__steps">
+            {steps.map((s, i) => (
+              <li key={i} className="chat-trace__step">
+                <span className="chat-trace__type">{s.type}</span>
+                {s.handle && (
+                  <span className={`chat-trace__chip chat-trace__chip--${HANDLE_TONE[s.handle] || 'mute'}`}>
+                    → {s.handle}
+                  </span>
+                )}
+                {s.detail && <span className="chat-trace__detail">{s.detail}</span>}
+              </li>
+            ))}
+          </ol>
+
+          {varEntries.length > 0 && (
+            <div className="chat-trace__vars">
+              <div className="chat-trace__vars-head">variables</div>
+              {varEntries.map(([k, v]) => (
+                <div key={k} className="chat-trace__var">
+                  <span className="chat-trace__var-key">{k}</span>
+                  <span className="chat-trace__var-val">{formatVar(v)}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // In-house test chat for a saved bot. Opens a runtime session, then exchanges messages.
 // Renders a subtle note whenever a reply came from the bot's fallbackAnswer (matched === null).
 export default function TestBotPanel({ botId, botName, open, onClose }) {
   const [sessionId, setSessionId] = useState(null);
-  const [messages, setMessages] = useState([]); // { from: 'bot'|'user', text, fallback? }
+  // { from: 'bot'|'user', text, fallback?, trace?: Array, vars?: object }
+  const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState(null);
@@ -58,7 +122,13 @@ export default function TestBotPanel({ botId, botName, open, onClose }) {
     try {
       const res = await sendMessage(sessionId, text);
       setMessages((m) =>
-        m.concat({ from: 'bot', text: res.reply, fallback: res.matched == null }),
+        m.concat({
+          from: 'bot',
+          text: res.reply,
+          fallback: res.matched == null,
+          trace: Array.isArray(res.trace) ? res.trace : [],
+          vars: res.vars,
+        }),
       );
     } catch (err) {
       const msg = err instanceof ApiError ? err.messages.join(', ') : 'Failed to send message.';
@@ -91,6 +161,7 @@ export default function TestBotPanel({ botId, botName, open, onClose }) {
           <div key={i} className={`chat-msg chat-msg--${m.from}`}>
             <div className="chat-bubble">{m.text}</div>
             {m.fallback && <div className="chat-note">fallback answer (no keyword matched)</div>}
+            {m.from === 'bot' && <MessageTrace trace={m.trace} vars={m.vars} />}
           </div>
         ))}
         {busy && (

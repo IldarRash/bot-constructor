@@ -192,6 +192,7 @@ export function useBoardCollaboration(boardId, { setNodes, setEdges, userName })
   // Explicit add/remove helpers so the editor can broadcast node lifecycle precisely.
   const broadcastNodeAdd = useCallback((node) => emit('NODE_ADD', node), [emit]);
   const broadcastNodeRemove = useCallback((id) => emit('NODE_REMOVE', { id }), [emit]);
+  const broadcastEdgeRemove = useCallback((id) => emit('EDGE_REMOVE', { id }), [emit]);
   const broadcastNodesChange = useCallback((changes) => emit('NODES_CHANGE', changes), [emit]);
 
   const cursorTimerRef = useRef(0);
@@ -216,6 +217,7 @@ export function useBoardCollaboration(boardId, { setNodes, setEdges, userName })
     onConnect,
     broadcastNodeAdd,
     broadcastNodeRemove,
+    broadcastEdgeRemove,
     broadcastNodesChange,
     sendCursor,
   };

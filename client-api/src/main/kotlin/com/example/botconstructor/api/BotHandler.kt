@@ -85,6 +85,21 @@ class BotHandler(
                 .onErrorResume(::handleInvalidRequestException)
     }
 
+    /**
+     * Internal, unauthenticated lookup of a bot by its webhook token, called server-to-server by
+     * bot-api on behalf of an inbound webhook caller. The token in the path IS the secret that
+     * authorizes reading this one bot's flow, so there is no user session / ownership check here.
+     * An unknown (or blank) token returns the SAME opaque 404 as any other miss, giving no
+     * enumeration signal. The route is permitted in SecurityConfig under the by-webhook subpath.
+     */
+    fun getBotByWebhookToken(serverRequest: ServerRequest): Mono<ServerResponse> {
+        val token = serverRequest.pathVariable("token")
+        return botService.findByWebhookToken(token)
+                .flatMap { ok().bodyValue(it) }
+                .switchIfEmpty(ServerResponse.notFound().build())
+                .onErrorResume(::handleInvalidRequestException)
+    }
+
     private fun handleInvalidRequestException(exception: Throwable): Mono<ServerResponse> {
         return if (exception is InvalidRequestException) {
             val response = InvalidRequestExceptionResponse(mapOf(exception.subject to listOf(exception.violation)))
