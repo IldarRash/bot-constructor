@@ -1,11 +1,13 @@
 import { api } from './client';
 
 // All bot endpoints require auth and are owner-scoped.
-// Bot shape (BotView / BotRequest):
+// Bot shape (BotView / BotRequest), per docs/workflow-engine.md:
 //   { id?, name, type: "Instagram"|"Vkontakte"|"Telegram", ownerId?,
-//     questions: [ { text, keyWords: [string], answer } ], fallbackAnswer }
-// Each question carries its OWN answer; the bot has a single bot-level fallbackAnswer.
-// The bodies are passed through verbatim — BotEditor maps flow nodes <-> questions[].
+//     fallbackAnswer,
+//     nodes: [ { id, type, position: {x,y}, data } ],
+//     edges: [ { id, source, target, sourceHandle } ] }
+// The graph mirrors React Flow's native node/edge shape; bodies are passed through
+// verbatim. Legacy questions-based bots are converted to a graph by client-api on read.
 export const listBots = () => api('/api/bots');
 
 export const getBot = (id) => api(`/api/bots/${id}`);

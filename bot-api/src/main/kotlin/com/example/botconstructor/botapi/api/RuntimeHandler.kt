@@ -1,9 +1,11 @@
 package com.example.botconstructor.botapi.api
 
 import com.example.botconstructor.botapi.model.dto.MessageRequest
+import com.example.botconstructor.botapi.model.dto.WebhookRequest
 import com.example.botconstructor.botapi.runtime.RuntimeService
 import com.example.botconstructor.botapi.runtime.SessionNotFoundException
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -22,6 +24,11 @@ class RuntimeHandler(
         private val runtimeService: RuntimeService,
 ) {
 
+    private companion object {
+        /** Upper bound on a single user message, guarding the engine from oversized input. */
+        const val MAX_MESSAGE_LENGTH = 4000
+    }
+
     /**
      * Starts a runtime session for the bot identified by the path variable `id`.
      */
@@ -39,9 +46,47 @@ class RuntimeHandler(
     fun handleMessage(serverRequest: ServerRequest): Mono<ServerResponse> {
         val sessionId = serverRequest.pathVariable("sessionId")
         return serverRequest.bodyToMono(MessageRequest::class.java)
-                .flatMap { runtimeService.handleMessage(sessionId, it.text) }
-                .flatMap { ok().bodyValue(it) }
+                .flatMap { request ->
+                    if (request.text.length > MAX_MESSAGE_LENGTH) {
+                        ServerResponse.badRequest()
+                                .bodyValue(mapOf("error" to "message exceeds $MAX_MESSAGE_LENGTH characters"))
+                    } else {
+                        runtimeService.handleMessage(sessionId, request.text)
+                                .flatMap { ok().bodyValue(it) }
+                    }
+                }
                 .onErrorResume(::handleError)
+    }
+
+    /**
+     * Handles a stateless webhook invocation of the bot bound to the path variable `token`. Public
+     * route: no auth handling — the token is the credential, resolved at the data layer. An unknown
+     * token (client-api 404) maps to a 404 here.
+     */
+    fun runWebhook(serverRequest: ServerRequest): Mono<ServerResponse> {
+        val token = serverRequest.pathVariable("token")
+        return serverRequest.bodyToMono(WebhookRequest::class.java)
+                // Tolerate an empty/absent body: run the flow with no message and no extra vars.
+                .defaultIfEmpty(WebhookRequest())
+                .flatMap { request ->
+                    val message = request.message
+                    if (message != null && message.length > MAX_MESSAGE_LENGTH) {
+                        ServerResponse.badRequest()
+                                .bodyValue(mapOf("error" to "message exceeds $MAX_MESSAGE_LENGTH characters"))
+                    } else {
+                        runtimeService.runWebhook(token, request)
+                                .flatMap { ok().bodyValue(it) }
+                    }
+                }
+                .onErrorResume(::handleWebhookError)
+    }
+
+    /** Maps an unknown webhook token (upstream client-api 404) to a 404, else reuses [handleError]. */
+    private fun handleWebhookError(exception: Throwable): Mono<ServerResponse> {
+        if (exception is WebClientResponseException && exception.statusCode == HttpStatus.NOT_FOUND) {
+            return notFound().build()
+        }
+        return handleError(exception)
     }
 
     private fun handleError(exception: Throwable): Mono<ServerResponse> {

@@ -123,6 +123,124 @@
   color: var(--text-faint);
 }
 
+/* Execution trace (n8n-style debugger view under a bot reply) */
+.chat-trace {
+  margin-top: 5px;
+  max-width: 100%;
+}
+
+.chat-trace__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: none;
+  background: transparent;
+  padding: 2px 0;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}
+.chat-trace__toggle:hover {
+  color: var(--text-1);
+}
+.chat-trace__caret {
+  display: inline-block;
+  transition: transform 140ms var(--ease);
+  font-size: 10px;
+}
+.chat-trace__toggle.is-open .chat-trace__caret {
+  transform: rotate(90deg);
+}
+
+.chat-trace__body {
+  margin-top: 5px;
+  padding: 8px 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  animation: msg-in 160ms var(--ease);
+}
+
+.chat-trace__steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  counter-reset: trace;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.chat-trace__step {
+  counter-increment: trace;
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 6px;
+  line-height: 1.5;
+}
+.chat-trace__step::before {
+  content: counter(trace);
+  color: var(--text-faint);
+  min-width: 14px;
+  text-align: right;
+}
+.chat-trace__type {
+  color: var(--text-1);
+  font-weight: 600;
+}
+.chat-trace__chip {
+  padding: 0 6px;
+  border-radius: var(--r-sm);
+  font-size: var(--fs-xs);
+  line-height: 1.6;
+  white-space: nowrap;
+}
+.chat-trace__chip--ok {
+  background: var(--success-soft);
+  color: var(--success);
+}
+.chat-trace__chip--err {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+.chat-trace__chip--mute {
+  background: var(--surface-3);
+  color: var(--text-3);
+}
+.chat-trace__detail {
+  color: var(--text-3);
+  word-break: break-word;
+}
+
+.chat-trace__vars {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border);
+}
+.chat-trace__vars-head {
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+.chat-trace__var {
+  display: flex;
+  gap: 8px;
+  line-height: 1.5;
+}
+.chat-trace__var-key {
+  color: var(--accent);
+  flex-shrink: 0;
+}
+.chat-trace__var-val {
+  color: var(--text-1);
+  word-break: break-word;
+  white-space: pre-wrap;
+}
+
 /* Typing indicator (the "…" bubble) */
 .chat-typing {
   display: inline-flex;

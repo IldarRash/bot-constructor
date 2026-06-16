@@ -32,4 +32,17 @@ class ClientApiClient(
                 .retrieve()
                 .bodyToMono(BotSummary::class.java)
     }
+
+    /**
+     * Resolves the bot bound to webhook [token] via client-api's internal permitAll lookup
+     * (`GET /api/internal/bots/by-webhook/{token}`). No Authorization header is sent — the token is
+     * the credential. An unknown token surfaces as a `WebClientResponseException` 404, which the
+     * handler maps to a 404 response.
+     */
+    fun fetchBotByWebhook(token: String): Mono<BotSummary> {
+        return webClient.get()
+                .uri("/api/internal/bots/by-webhook/{token}", token)
+                .retrieve()
+                .bodyToMono(BotSummary::class.java)
+    }
 }

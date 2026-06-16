@@ -31,6 +31,12 @@ class SecurityConfig {
             .authorizeExchange { ex ->
                 ex.pathMatchers(HttpMethod.POST, "/api/users", "/api/users/login").permitAll()
                 ex.pathMatchers(HttpMethod.GET, "/actuator/**", "/actuator").permitAll()
+                // Internal webhook lookup for bot-api: unauthenticated-but-token-guarded. There is
+                // no user JWT because the webhook caller is anonymous; the unguessable, high-entropy
+                // token in the path is the only credential and authorizes reading exactly that one
+                // bot's flow. Unknown tokens return an opaque 404 (no enumeration). Scoped to GET
+                // and this exact subpath so it widens the public surface as little as possible.
+                ex.pathMatchers(HttpMethod.GET, "/api/internal/bots/by-webhook/**").permitAll()
                 // RSocket-over-websocket is a separate boundary that authenticates from its own
                 // SETUP frame; the websocket upgrade must not be challenged by the HTTP filter.
                 ex.pathMatchers("/rsocket").permitAll()
