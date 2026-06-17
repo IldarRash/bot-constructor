@@ -54,6 +54,7 @@ class UserHandler(
                 .bodyToMono(UserAuthenticationRequest::class.java)
                 .flatMap { userService.login(it) }
                 .flatMap { ok().bodyValue(it) }
+                .onErrorResume(::handleInvalidRequestException)
     }
 
     /**
