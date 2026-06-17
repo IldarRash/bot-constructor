@@ -38,18 +38,40 @@ spec:
             # Used by the cron scheduler to invoke each scheduled bot's webhook on bot-api.
             - name: BOT_API_URI
               value: "http://bot-api:8083"
+            # Cap heap to the container limit and use SerialGC — fewer GC threads/less overhead on a
+            # 1-CPU minikube node. Remove once this service runs as a GraalVM native image.
+            - name: JAVA_TOOL_OPTIONS
+              value: "-XX:MaxRAMPercentage=75 -XX:+UseSerialGC"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              memory: 1Gi
+          # Cold JVM start under contention can take a while; the startupProbe gives it up to ~150s
+          # before liveness begins, so a slow start is never mistaken for a liveness failure.
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 9000
+            failureThreshold: 30
+            periodSeconds: 5
           readinessProbe:
             httpGet:
               path: /actuator/health
               port: 9000
             initialDelaySeconds: 20
             periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
           livenessProbe:
             httpGet:
               path: /actuator/health
               port: 9000
             initialDelaySeconds: 40
             periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 6
 ---
 apiVersion: v1
 kind: Service

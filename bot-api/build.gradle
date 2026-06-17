@@ -3,6 +3,7 @@ plugins {
     id "io.spring.dependency-management"
     id "org.jetbrains.kotlin.jvm"
     id "org.jetbrains.kotlin.plugin.spring"
+    id "org.graalvm.buildtools.native"
 }
 
 dependencies {
@@ -24,4 +25,17 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+// bot-api embeds the GraalVM polyglot JS engine (ExpressionEvaluator). With the modern Polyglot API
+// (25.x), the JS language is contributed to the native image automatically by the
+// `org.graalvm.polyglot:js-community` jar on the classpath (it ships its own native-image config) — the
+// legacy `--language:js` macro option no longer exists and makes native-image fail with
+// "Unknown name in option specification: language:js". Expect a heavier, RAM-hungry build than the
+// other modules. NOTE: on the Community engine `ResourceLimits.statementLimit` no-ops, so the
+// ~2s wall-clock `Context.interrupt` is the only runaway-loop backstop (see ExpressionEvaluatorSandboxTest).
+graalvmNative {
+    metadataRepository {
+        enabled = true
+    }
 }

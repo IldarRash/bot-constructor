@@ -36,11 +36,15 @@ import java.util.concurrent.ConcurrentHashMap
 class ScheduledFlowRunner(
         private val botTemplateRepository: BotTemplateRepository,
         @param:Value("\${BOT_API_URI:http://localhost:8083}") private val botApiUri: String,
-        webClientBuilder: WebClient.Builder = WebClient.builder(),
 ) {
 
     private val log = LoggerFactory.getLogger(ScheduledFlowRunner::class.java)
-    private val webClient: WebClient = webClientBuilder.baseUrl(botApiUri).build()
+    // Build the WebClient inline rather than taking a `WebClient.Builder` constructor parameter. A
+    // constructor with a Kotlin default/optional parameter forces Spring to instantiate the bean via
+    // Kotlin reflection, which fails under GraalVM native image with
+    // `KotlinReflectionInternalError: Unresolved class WebClient$Builder`. With only non-optional
+    // params, Spring AOT invokes the constructor directly. (Tests exercise the static helpers only.)
+    private val webClient: WebClient = WebClient.builder().baseUrl(botApiUri).build()
 
     /** Last time each bot (by id) was fired, used to avoid double-firing within a cron window. */
     private val lastFireByBot = ConcurrentHashMap<String, Instant>()

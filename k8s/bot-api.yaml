@@ -24,18 +24,40 @@ spec:
           env:
             - name: CLIENT_API_URI
               value: http://client-api:9000
+            # Cap heap to the container limit and use SerialGC — fewer GC threads/less overhead on a
+            # 1-CPU minikube node. Remove once this service runs as a GraalVM native image.
+            - name: JAVA_TOOL_OPTIONS
+              value: "-XX:MaxRAMPercentage=75 -XX:+UseSerialGC"
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              # bot-api hosts the GraalVM polyglot JS engine, so it carries more native footprint than
+              # the other JVM services — give it a slightly higher ceiling.
+              memory: 1Gi
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8083
+            failureThreshold: 30
+            periodSeconds: 5
           readinessProbe:
             httpGet:
               path: /actuator/health
               port: 8083
             initialDelaySeconds: 20
             periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
           livenessProbe:
             httpGet:
               path: /actuator/health
               port: 8083
             initialDelaySeconds: 40
             periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 6
 ---
 apiVersion: v1
 kind: Service

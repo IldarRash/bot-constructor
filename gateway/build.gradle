@@ -3,6 +3,7 @@ plugins {
     id 'io.spring.dependency-management'
     id 'org.jetbrains.kotlin.jvm'
     id 'org.jetbrains.kotlin.plugin.spring'
+    id 'org.graalvm.buildtools.native'
 }
 
 group = 'com.example'
@@ -30,4 +31,12 @@ dependencyManagement {
 
 tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
+}
+
+// Pull third-party reachability metadata from the GraalVM repo so common libraries (Reactor, Spring
+// Cloud Gateway, Netty) work in a native image without hand-written hints.
+graalvmNative {
+    metadataRepository {
+        enabled = true
+    }
 }

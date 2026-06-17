@@ -3,6 +3,7 @@ plugins {
     id "io.spring.dependency-management"
     id "org.jetbrains.kotlin.jvm"
     id "org.jetbrains.kotlin.plugin.spring"
+    id "org.graalvm.buildtools.native"
 }
 
 dependencies {
@@ -31,4 +32,12 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+// Pull third-party reachability metadata from the GraalVM repo (Reactor, Spring Data Mongo, Netty,
+// etc.). JJWT 0.12 and the functionally-routed DTOs are not covered there — see NativeHints.kt.
+graalvmNative {
+    metadataRepository {
+        enabled = true
+    }
 }

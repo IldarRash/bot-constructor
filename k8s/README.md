@@ -1,17 +1,24 @@
 # Deploying bot-constructor on minikube
 
-Plain Kubernetes manifests for the trimmed stack: **mongo + client-api + gateway + client-ui**.
+Plain Kubernetes manifests for the stack: **mongo + client-api + bot-api + gateway + client-ui**.
 All resources live in the `bot-constructor` namespace.
 
 ## Architecture
 
 ```
-            ┌────────────── ingress (host: bot.local) ──────────────┐
-            │  /      -> client-ui:80   (Vite SPA served by nginx)   │
-            │  /api   -> gateway:8080   (routes /api/** -> client-api)│
-            └────────────────────────────────────────────────────────┘
-client-ui (nginx) ── /api/ proxy ──> gateway:8080 ──> client-api:9000 ──> mongo:27017
+            ┌────────────────── ingress (host: bot.local) ──────────────────┐
+            │  /      -> client-ui:80   (Vite SPA served by nginx)           │
+            │  /api   -> gateway:8080                                        │
+            │            ├─ /api/runtime/** -> bot-api:8083  (workflow runtime)│
+            │            └─ /api/**         -> client-api:9000               │
+            └────────────────────────────────────────────────────────────────┘
+client-ui (nginx) ── /api/ proxy ──> gateway:8080 ─┬─> client-api:9000 ──> mongo:27017
+                                                   └─> bot-api:8083    ──> client-api:9000
 ```
+
+The gateway splits `/api`: runtime calls (`/api/runtime/**`) go to **bot-api** (the workflow engine);
+everything else under `/api/**` goes to **client-api**. The RSocket collaboration socket
+(`/rsocket/**`) is proxied to client-api. bot-api calls back into client-api (`CLIENT_API_URI`).
 
 Two paths reach the API:
 - via the **ingress** `/api` rule directly to the gateway, and
@@ -23,11 +30,17 @@ Two paths reach the API:
 - `minikube` and `kubectl` installed.
 - Docker available to minikube's build (the steps below build images directly inside minikube,
   so no external registry is needed).
+- **Give the node ≥6 GiB of memory.** The full stack is mongo + three JVMs + nginx on top of the
+  control plane; with the default ~2–3 GiB node a rolling-update surge pins memory at 100% and
+  `kube-apiserver` (a static pod on the node) starves → `kubectl` fails with
+  `net/http: TLS handshake timeout`. Start with `minikube start --memory=6g`, or for an already
+  running docker-driver node: `docker update --memory 6g --memory-swap 8g minikube` (cgroup v2
+  accepts it live; apiserver recovers in seconds).
 
 ## 1. Start minikube and enable ingress
 
 ```bash
-minikube start
+minikube start --memory=6g
 minikube addons enable ingress
 ```
 
@@ -39,6 +52,7 @@ cluster's container runtime, so `imagePullPolicy: IfNotPresent` finds it locally
 
 ```bash
 minikube image build -t bot-constructor/client-api:local -f client-api/Dockerfile .
+minikube image build -t bot-constructor/bot-api:local     -f bot-api/Dockerfile .
 minikube image build -t bot-constructor/gateway:local    -f gateway/Dockerfile .
 minikube image build -t bot-constructor/client-ui:local  -f client-ui/Dockerfile .
 ```
@@ -64,8 +78,8 @@ minikube image build -t bot-constructor/client-ui:local  -f client-ui/Dockerfile
 kubectl apply -f k8s/
 ```
 
-This creates the namespace, the mongo Secret/Deployment/Service, and the
-Deployments/Services for client-api, gateway, and client-ui, plus the ingress.
+This creates the namespace, the mongo Secret/PVC/Deployment/Service, and the
+Deployments/Services for client-api, bot-api, gateway, and client-ui, plus the ingress.
 
 ## 4. Watch the pods come up
 
