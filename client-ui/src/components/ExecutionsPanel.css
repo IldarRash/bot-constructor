@@ -1,0 +1,199 @@
+.exec-panel {
+  width: 350px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-1);
+  border-left: 1px solid var(--border);
+  min-height: 0;
+  animation: panel-slide 240ms var(--ease);
+}
+
+.exec-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px var(--sp-4);
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, var(--surface-2), var(--surface-1));
+}
+
+.exec-panel__head h3 {
+  margin: 0;
+  font-size: var(--fs-base);
+}
+
+.exec-panel__close {
+  border: none;
+  background: transparent;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--text-3);
+  border-radius: var(--r-sm);
+  width: 28px;
+  height: 28px;
+}
+.exec-panel__close:hover {
+  color: var(--text-1);
+  background: var(--surface-3);
+}
+
+.exec-panel__hint {
+  padding: 8px var(--sp-4);
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
+  line-height: 1.45;
+}
+
+.exec-panel__list {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--sp-3) var(--sp-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.exec-panel__empty {
+  margin: 0;
+  padding: var(--sp-3) 0;
+  color: var(--text-faint);
+  font-size: var(--fs-sm);
+}
+
+.exec-row {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  text-align: left;
+  width: 100%;
+  padding: 10px 12px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  cursor: pointer;
+  color: var(--text-1);
+  transition: border-color 140ms var(--ease), background 140ms var(--ease);
+}
+.exec-row:hover {
+  border-color: var(--border-strong);
+  background: var(--surface-3);
+}
+.exec-row.is-active {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-ring);
+}
+
+.exec-row__top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.exec-badge {
+  padding: 1px 8px;
+  border-radius: var(--r-pill);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  font-weight: 600;
+}
+.exec-badge--ok {
+  background: var(--success-soft);
+  color: var(--success);
+}
+.exec-badge--err {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.exec-row__trigger {
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+}
+.exec-row__time {
+  margin-left: auto;
+  font-size: var(--fs-xs);
+  color: var(--text-faint);
+}
+
+.exec-row__reply {
+  font-size: var(--fs-sm);
+  line-height: 1.4;
+  color: var(--text-1);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.exec-row__meta {
+  font-size: var(--fs-xs);
+  color: var(--text-faint);
+}
+
+.exec-panel__more {
+  align-self: stretch;
+  margin-top: var(--sp-2);
+}
+
+.exec-panel__error {
+  padding: 8px 11px;
+  background: var(--danger-soft);
+  border: 1px solid var(--danger-border);
+  color: var(--danger);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+}
+
+/* Per-node inspect view shown in the editor's right inspector while a node is selected and an
+   execution is active. Pretty-printed JSON of what the node saw (inputItems) and emitted (outputs). */
+.exec-inspect__exec {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--text-3);
+  margin-bottom: var(--sp-2);
+}
+.exec-inspect__section-head {
+  margin: var(--sp-3) 0 6px;
+  font-size: var(--fs-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-faint);
+}
+.exec-inspect__handle {
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  color: var(--accent);
+  margin: 8px 0 4px;
+}
+.exec-inspect__json {
+  margin: 0;
+  padding: 8px 10px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  font-family: var(--font-mono);
+  font-size: var(--fs-xs);
+  line-height: 1.5;
+  color: var(--text-1);
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow-x: auto;
+}
+.exec-inspect__empty {
+  color: var(--text-faint);
+  font-size: var(--fs-sm);
+}
+.exec-inspect__error {
+  margin-top: var(--sp-2);
+  padding: 8px 11px;
+  background: var(--danger-soft);
+  border: 1px solid var(--danger-border);
+  color: var(--danger);
+  border-radius: var(--r-md);
+  font-size: var(--fs-sm);
+  font-family: var(--font-mono);
+}

@@ -32,8 +32,11 @@ class BotHandlerTest {
     private val requestValidator = RequestValidator(Validation.buildDefaultValidatorFactory().validator)
     private val botHandler = BotHandler(botService, userSessionProvider, requestValidator)
 
+    private val executionHandler = mockk<ExecutionHandler>(relaxed = true)
+    private val credentialHandler = mockk<CredentialHandler>(relaxed = true)
+
     private val client = WebTestClient
-            .bindToRouterFunction(WebConfig().route(userHandler, botHandler))
+            .bindToRouterFunction(WebConfig().route(userHandler, botHandler, executionHandler, credentialHandler))
             .build()
 
     private fun session(): Mono<UserSession> {

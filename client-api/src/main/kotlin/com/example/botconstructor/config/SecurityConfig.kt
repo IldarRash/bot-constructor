@@ -37,6 +37,17 @@ class SecurityConfig {
                 // bot's flow. Unknown tokens return an opaque 404 (no enumeration). Scoped to GET
                 // and this exact subpath so it widens the public surface as little as possible.
                 ex.pathMatchers(HttpMethod.GET, "/api/internal/bots/by-webhook/**").permitAll()
+                // Internal execution-record write from bot-api: same server-to-server boundary as
+                // the webhook lookup. The gateway 404s all /api/internal/**, so this POST is never
+                // client-reachable; the owner is resolved from the bot document in client-api, never
+                // trusted from the request body. Scoped to POST and this exact path.
+                ex.pathMatchers(HttpMethod.POST, "/api/internal/executions").permitAll()
+                // Internal decrypted-credential fetch for bot-api: same server-to-server boundary as
+                // the webhook lookup. The gateway 404s all internal paths, so this GET is never
+                // client-reachable; the service returns the secret only when the credential and the
+                // referenced bot share an owner (else an opaque 404). Scoped to GET and the internal
+                // credentials subpath.
+                ex.pathMatchers(HttpMethod.GET, "/api/internal/credentials/**").permitAll()
                 // RSocket-over-websocket is a separate boundary that authenticates from its own
                 // SETUP frame; the websocket upgrade must not be challenged by the HTTP filter.
                 ex.pathMatchers("/rsocket").permitAll()

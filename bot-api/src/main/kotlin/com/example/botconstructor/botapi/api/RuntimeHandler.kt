@@ -1,5 +1,6 @@
 package com.example.botconstructor.botapi.api
 
+import com.example.botconstructor.botapi.model.dto.ManualRunRequest
 import com.example.botconstructor.botapi.model.dto.MessageRequest
 import com.example.botconstructor.botapi.model.dto.WebhookRequest
 import com.example.botconstructor.botapi.runtime.RuntimeService
@@ -37,6 +38,31 @@ class RuntimeHandler(
         val authHeader = serverRequest.headers().firstHeader(HttpHeaders.AUTHORIZATION)
         return runtimeService.startSession(botId, authHeader)
                 .flatMap { ok().bodyValue(it) }
+                .onErrorResume(::handleError)
+    }
+
+    /**
+     * Runs the saved flow for the bot `id` once, on demand, for the editor. Owner-scoped: the caller's
+     * Authorization header is forwarded to client-api (mirroring [startSession]), so a non-owner gets
+     * the same upstream not-found the session path gives. Returns the rich per-node data for inline
+     * inspection and supports pinned data (skip a node, reuse a pinned output).
+     */
+    fun runManual(serverRequest: ServerRequest): Mono<ServerResponse> {
+        val botId = serverRequest.pathVariable("id")
+        val authHeader = serverRequest.headers().firstHeader(HttpHeaders.AUTHORIZATION)
+        return serverRequest.bodyToMono(ManualRunRequest::class.java)
+                // Tolerate an empty/absent body: run the saved flow with no message, vars, or pins.
+                .defaultIfEmpty(ManualRunRequest())
+                .flatMap { request ->
+                    val message = request.message
+                    if (message != null && message.length > MAX_MESSAGE_LENGTH) {
+                        ServerResponse.badRequest()
+                                .bodyValue(mapOf("error" to "message exceeds $MAX_MESSAGE_LENGTH characters"))
+                    } else {
+                        runtimeService.runManual(botId, authHeader, request)
+                                .flatMap { ok().bodyValue(it) }
+                    }
+                }
                 .onErrorResume(::handleError)
     }
 

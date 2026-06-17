@@ -1,0 +1,224 @@
+/* Shared styling for typed workflow nodes: trigger, keyword, sendMessage. */
+.flow-node {
+  position: relative;
+  min-width: 200px;
+  max-width: 250px;
+  background: linear-gradient(180deg, var(--surface-2), var(--surface-1));
+  border: 1px solid var(--border-strong);
+  border-radius: var(--r-md);
+  padding: 11px 13px 12px;
+  font-size: var(--fs-sm);
+  color: var(--text-1);
+  box-shadow: var(--shadow-md);
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+}
+
+.flow-node.selected {
+  border-color: var(--accent);
+  box-shadow: var(--glow-accent);
+}
+
+.flow-node--trigger {
+  min-width: 160px;
+}
+
+.fn-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 6px;
+}
+
+.fn-tag {
+  display: grid;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border-radius: 5px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+}
+.fn-tag--trigger {
+  background: rgba(45, 212, 191, 0.16);
+  color: var(--accent-bright);
+}
+.fn-tag--keyword {
+  background: var(--violet-soft);
+  color: var(--violet);
+}
+.fn-tag--send {
+  background: var(--accent-soft);
+  color: var(--accent-bright);
+}
+.fn-tag--condition {
+  background: rgba(245, 158, 11, 0.16);
+  color: #f5a623;
+}
+.fn-tag--setvar {
+  background: var(--violet-soft);
+  color: var(--violet);
+}
+.fn-tag--http {
+  background: rgba(56, 189, 248, 0.16);
+  color: #38bdf8;
+}
+.fn-tag--merge {
+  background: rgba(45, 212, 191, 0.16);
+  color: var(--accent-bright);
+}
+.fn-tag--loop {
+  background: rgba(245, 158, 11, 0.16);
+  color: #f5a623;
+}
+
+.fn-label {
+  font-weight: 600;
+  color: var(--text-1);
+  word-break: break-word;
+  line-height: 1.35;
+}
+.fn-label.empty {
+  color: var(--text-faint);
+  font-style: italic;
+  font-weight: 500;
+}
+
+.fn-sub {
+  font-size: 12px;
+  color: var(--text-faint);
+}
+
+.fn-keywords {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.fn-chip {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: var(--violet-soft);
+  color: var(--violet);
+  border: 1px solid rgba(139, 125, 255, 0.28);
+  padding: 1px 7px;
+  border-radius: var(--r-pill);
+}
+
+.fn-none {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.fn-message {
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--text-2);
+  word-break: break-word;
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.fn-message.empty {
+  color: var(--text-faint);
+  font-style: italic;
+}
+
+.fn-condition,
+.fn-assign {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-2);
+  word-break: break-word;
+}
+.fn-condition.empty,
+.fn-assign.empty {
+  color: var(--text-faint);
+  font-style: italic;
+}
+.fn-expr,
+.fn-var {
+  color: var(--text-1);
+}
+.fn-var {
+  color: var(--violet);
+}
+.fn-op {
+  color: var(--text-faint);
+  font-weight: 700;
+}
+
+.fn-http {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px;
+  margin-top: 4px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-2);
+  word-break: break-all;
+}
+.fn-http.empty .fn-expr {
+  color: var(--text-faint);
+  font-style: italic;
+}
+.fn-method {
+  flex-shrink: 0;
+  font-weight: 700;
+  color: #38bdf8;
+}
+.fn-saveas {
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.fn-handle-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding: 0 6px;
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+.fn-handle-label--match {
+  color: var(--accent-bright);
+}
+.fn-handle-label--nomatch {
+  color: var(--text-faint);
+}
+.fn-handle-label--error {
+  color: #f87171;
+}
+
+/* Connection handles — dark, accent on hover */
+.flow-node .fn-handle {
+  width: 10px;
+  height: 10px;
+  background: var(--surface-3);
+  border: 2px solid var(--border-strong);
+  transition: background var(--dur) var(--ease), border-color var(--dur) var(--ease);
+}
+.flow-node .fn-handle:hover,
+.flow-node.selected .fn-handle {
+  background: var(--accent);
+  border-color: var(--accent-bright);
+}
+.flow-node .fn-handle--match {
+  border-color: var(--accent);
+}
+.flow-node .fn-handle--error {
+  border-color: #f87171;
+}
